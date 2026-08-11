@@ -1,0 +1,209 @@
+/**
+ * Enterprise ID Card Designer - Google Apps Script Backend
+ * Handles automated sheet initialization, CRUD operations, and paginated blueprint loading.
+ */
+
+function doGet(e) {
+  return handleRequest(e);
+}
+
+function doPost(e) {
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
+  var lock = LockService.getScriptLock();
+  // Prevent concurrent write conflicts
+  lock.tryLock(10000);
+
+  try {
+    var data = {};
+    
+    // Parse incoming request payload safely
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (parseError) {
+        data = e.parameter;
+      }
+    } else if (e.parameter) {
+      data = e.parameter;
+    }
+
+    var action = data.action;
+    var result = { success: false };
+
+    // Get or automatically setup the target sheet tab and headers
+    var sheet = getOrCreateSheet();
+
+    if (action === 'save') {
+      result = saveTemplate(sheet, data.template);
+    } else if (action === 'load') {
+      var offset = parseInt(data.offset || 0, 10);
+      var limit = parseInt(data.limit || 6, 10);
+      result = loadTemplates(sheet, offset, limit);
+    } else if (action === 'delete') {
+      result = deleteTemplate(sheet, data.uid);
+    } else if (action === 'init') {
+      result = { success: true, message: 'Google Sheets database initialized successfully.' };
+    } else {
+      result = { success: false, message: 'Invalid or missing action parameter.' };
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Ensures the target sheet tab and formatted table headers exist automatically.
+ */
+function getOrCreateSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheetName = "ID_Card_Blueprints";
+  var sheet = ss.getSheetByName(sheetName);
+  var headers = ["uid", "label", "dimensions", "backgroundStyles", "elementsDataset", "createdAt", "updatedAt"];
+
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length)
+         .setFontWeight("bold")
+         .setBackground("#2563eb")
+         .setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  } else if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length)
+         .setFontWeight("bold")
+         .setBackground("#2563eb")
+         .setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+/**
+ * Saves a new template or updates an existing blueprint matching the unique UID.
+ */
+function saveTemplate(sheet, template) {
+  if (!template || !template.uid) {
+    return { success: false, message: "Invalid blueprint data payload." };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var uidStr = String(template.uid);
+  var rowIndex = -1;
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === uidStr) {
+      rowIndex = i + 1; // Convert 0-index to 1-based row index
+      break;
+    }
+  }
+
+  var now = new Date().toISOString();
+  var dimensionsStr = typeof template.dimensions === 'string' ? template.dimensions : JSON.stringify(template.dimensions || {});
+  var backgroundStylesStr = typeof template.backgroundStyles === 'string' ? template.backgroundStyles : JSON.stringify(template.backgroundStyles || {});
+  var elementsDatasetStr = typeof template.elementsDataset === 'string' ? template.elementsDataset : JSON.stringify(template.elementsDataset || []);
+
+  if (rowIndex > 0) {
+    // Update existing blueprint record
+    var createdAt = data[rowIndex - 1][5] || now;
+    sheet.getRange(rowIndex, 1, 1, 7).setValues([[
+      uidStr,
+      template.label || "Untitled Template",
+      dimensionsStr,
+      backgroundStylesStr,
+      elementsDatasetStr,
+      createdAt,
+      now
+    ]]);
+    return { success: true, message: "Blueprint updated successfully.", uid: template.uid };
+  } else {
+    // Append new blueprint record
+    sheet.appendRow([
+      uidStr,
+      template.label || "Untitled Template",
+      dimensionsStr,
+      backgroundStylesStr,
+      elementsDatasetStr,
+      now,
+      now
+    ]);
+    return { success: true, message: "Blueprint created and saved successfully.", uid: template.uid };
+  }
+}
+
+/**
+ * Loads blueprints with pagination support (chunks) to optimize execution limits.
+ */
+function loadTemplates(sheet, offset, limit) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return { success: true, templates: [], total: 0, hasMore: false };
+  }
+
+  var data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
+  var total = data.length;
+
+  // Reverse so newest edits display first
+  data.reverse();
+
+  var pagedData = data.slice(offset, offset + limit);
+  var templates = pagedData.map(function(row) {
+    var dimensions = {};
+    var backgroundStyles = {};
+    var elementsDataset = [];
+
+    try { dimensions = JSON.parse(row[2]); } catch(e) {}
+    try { backgroundStyles = JSON.parse(row[3]); } catch(e) {}
+    try { elementsDataset = JSON.parse(row[4]); } catch(e) {}
+
+    return {
+      uid: isNaN(Number(row[0])) ? row[0] : Number(row[0]),
+      label: row[1],
+      dimensions: dimensions,
+      backgroundStyles: backgroundStyles,
+      elementsDataset: elementsDataset,
+      createdAt: row[5],
+      updatedAt: row[6]
+    };
+  });
+
+  var hasMore = (offset + limit) < total;
+
+  return {
+    success: true,
+    templates: templates,
+    total: total,
+    hasMore: hasMore,
+    offset: offset,
+    limit: limit
+  };
+}
+
+/**
+ * Permanently removes a blueprint by matching its UID.
+ */
+function deleteTemplate(sheet, uid) {
+  if (!uid) return { success: false, message: "Missing blueprint identifier." };
+  var data = sheet.getDataRange().getValues();
+  var uidStr = String(uid);
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === uidStr) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: "Blueprint deleted from backend." };
+    }
+  }
+  return { success: false, message: "Target blueprint record not found." };
+}
