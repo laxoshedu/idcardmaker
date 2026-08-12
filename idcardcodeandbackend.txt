@@ -1,0 +1,2930 @@
+V2
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Enterprise ID Card Designer Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --purple: #8b5cf6;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --bg-canvas: #e2e8f0;
+            --panel-border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-canvas);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+
+        /* App Main Title Header Bar */
+        .app-header-bar {
+            width: 98%;
+            max-width: 1300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            border: 1px solid var(--panel-border);
+            box-sizing: border-box;
+        }
+
+        .app-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-title-group h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: 0.5px;
+        }
+
+        .user-avatar-btn {
+            font-size: 26px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 2px solid var(--panel-border);
+            user-select: none;
+            transition: transform 0.2s, background 0.2s;
+            position: relative;
+        }
+        .user-avatar-btn:hover { background: #e2e8f0; transform: scale(1.08); }
+        .user-avatar-btn:active { transform: scale(0.95); }
+
+        .admin-badge-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger);
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        /* Control Center Toolbar */
+        .admin-panel {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 98%;
+            justify-content: center;
+            z-index: 100;
+            border: 1px solid var(--panel-border);
+        }
+
+        .tool-section {
+            border-right: 1px solid #e2e8f0;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tool-section:last-child { border: none; }
+        .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        button {
+            padding: 8px 14px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        button:hover { opacity: 0.95; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        button.secondary { background: #64748b; }
+        button.success { background: var(--success); }
+        button.purple { background: var(--purple); }
+        button.danger { background: var(--danger); }
+        button.dark { background: var(--dark); }
+        button.icon-btn { padding: 6px 10px; font-weight: bold; font-size: 12px; }
+
+        input, select {
+            padding: 7px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: var(--dark);
+            font-size: 13px;
+        }
+        input:focus, select:focus { outline: 2px solid var(--primary); background: #ffffff; }
+        input[type="range"] { padding: 0; cursor: pointer; height: 6px; }
+
+        /* Toggle Switch Style */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider { background-color: var(--success); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+        /* Editing Suite Canvas Layout */
+        .canvas-area {
+            position: relative;
+            padding: 40px;
+            background: #94a3b8;
+            border-radius: 12px;
+            overflow: auto;
+            max-width: 95vw;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #id-card {
+            width: 450px;
+            height: 280px;
+            background-color: transparent;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #id-card-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            background-color: #ffffff;
+            background-size: cover;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* Dynamic Canvas Elements Layout */
+        .element {
+            position: absolute;
+            min-width: 10px;
+            min-height: 10px;
+            cursor: move;
+            user-select: none;
+            border: 1px dashed transparent;
+            padding: 6px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            z-index: 5;
+        }
+
+        .element.image-element { padding: 0 !important; }
+        .element:hover { border-color: #2563eb; background: rgba(37, 99, 235, 0.03); }
+        .element.active { border: 2px solid var(--primary); background: transparent; }
+
+        .element img {
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: block;
+            object-fit: cover;
+        }
+
+        .text-content {
+            outline: none;
+            width: 100%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: var(--primary);
+            right: -5px; bottom: -5px;
+            cursor: nwse-resize;
+            display: none;
+            z-index: 10;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .element.active .resize-handle { display: block; }
+
+        /* Advanced Alignment Guides */
+        .alignment-guide {
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+        .alignment-guide.vertical {
+            width: 1px;
+            top: 0; bottom: 0;
+            background: #ef4444;
+            box-shadow: 0 0 3px rgba(239, 68, 68, 0.5);
+        }
+        .alignment-guide.horizontal {
+            height: 1px;
+            left: 0; right: 0;
+            background: #ef4444;
+            box-shadow: 0 0 3px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Component Layer Control Drawer System */
+        .drawer-panel {
+            position: fixed;
+            top: 0; right: -340px;
+            width: 320px; height: 100vh;
+            background: white;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--panel-border);
+        }
+        .drawer-panel.open { right: 0; }
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .drawer-header h3 { margin: 0; color: var(--dark); font-size: 15px; font-weight: 700; }
+        .close-btn { background: none; color: #64748b; font-size: 22px; padding: 0; border: none; cursor: pointer; }
+        
+        .layers-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .layer-item {
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .layer-item:hover { background: #f1f5f9; }
+        .layer-item.active-layer { background: #eff6ff; border-color: var(--primary); }
+        .layer-item-meta { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .layer-item-actions { display: flex; gap: 6px; justify-content: flex-end; width: 100%; }
+
+        /* Modals & Dialogs System */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            padding: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            box-sizing: border-box;
+            position: relative;
+        }
+        .modal-card h2 { margin-top: 0; margin-bottom: 18px; font-size: 18px; color: var(--dark); text-align: center; }
+        .modal-card .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+        .modal-card label { font-size: 11px; font-weight: 700; color: #64748b; }
+        .modal-card input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 14px; }
+        .modal-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+        .modal-tab-btn { flex: 1; padding: 10px; background: none; border: none; border-bottom: 2px solid transparent; color: #64748b; font-weight: 700; cursor: pointer; border-radius: 0; }
+        .modal-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Blueprint Storage Dashboard Layout */
+        .templates-section {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 98%;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-sizing: border-box;
+            border: 1px solid var(--panel-border);
+        }
+
+        .templates-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .templates-section h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .backend-status-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .backend-status-pill.online { background: #dcfce7; color: #15803d; }
+        .backend-status-pill.offline { background: #fef3c7; color: #b45309; }
+
+        .templates-sub-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .templates-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; margin-bottom: 25px; }
+
+        .template-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .template-item:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+
+        .preview-container-box {
+            position: relative;
+            overflow: hidden;
+            background: #cbd5e1;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .pagination-container {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Micro HTML Layout Reflection Engine System Styles */
+        .preview-scaled-mirror-root {
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: top left;
+            pointer-events: none;
+            user-select: none;
+        }
+        .preview-scaled-mirror-root .element { border: none !important; background: transparent !important; }
+        .preview-scaled-mirror-root .image-element { padding: 0 !important; }
+        .preview-scaled-mirror-root .resize-handle { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Main Header Bar with App Title & Avatar Icon -->
+    <div class="app-header-bar">
+        <div class="app-title-group">
+            <span style="font-size: 24px;">🎴</span>
+            <h1>ID CARD MAKER</h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="user-display-info" style="font-size: 12px; font-weight: 700; color: #475569; text-align: right;">
+                <span id="account-status-label">Guest Mode</span>
+            </div>
+            <div id="user-avatar-trigger" class="user-avatar-btn" title="Click for Account / Long press 10s for Admin Login">
+                👤
+                <div id="admin-indicator" class="admin-badge-indicator">ADMIN</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="tool-section">
+            <label>Workspace Save Management</label>
+            <div class="row">
+                <button class="purple" onclick="createNewBlankCardWorkspace()" style="font-weight: bold;" title="Reset workspace to start a new ID card layout from scratch">➕ Create New ID Card</button>
+                <button class="success" onclick="saveActiveWorkspaceChanges()" style="font-weight: bold;" title="Save active template configuration changes directly (Ctrl + S)">💾 Save Changes</button>
+            </div>
+            <div class="row" style="margin-top: 2px;">
+                <button class="secondary" onclick="createNewTemplateBlueprint()" style="font-weight: bold;" title="Save current layout setup configurations as a fresh blueprint template block">📋 Save As Template</button>
+                <button class="secondary icon-btn" onclick="undoWorkspaceAction()" title="Undo action layer mapping modification step">⟲ Undo</button>
+                <button class="secondary icon-btn" onclick="redoWorkspaceAction()" title="Redo structural rendering pipeline step">⟳ Redo</button>
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <label>Card Formats Matrix</label>
+            <div class="row">
+                <button class="secondary" onclick="setOrientation('landscape')">Landscape</button>
+                <button class="secondary" onclick="setOrientation('portrait')">Vertical</button>
+            </div>
+            <div class="row">
+                W: <input type="number" id="cardW" value="450" style="width:52px" onchange="updateCardSize(); saveHistoryState(); pushRealTimePreviewSync();">
+                H: <input type="number" id="cardH" value="280" style="width:52px" onchange="updateCardSize(); saveHistoryState(); pushRealTimePreviewSync();">
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <label>Background Space</label>
+            <div class="row">
+                <button onclick="document.getElementById('bgInput').click()">Set Image</button>
+                <button class="danger" onclick="removeBackground()">Clear</button>
+                <input type="color" id="bgColor" value="#ffffff" onchange="updateBgColor(this.value)">
+            </div>
+            <div class="row">
+                <label style="font-weight:normal; text-transform:none;">Bg Opacity:</label>
+                <input type="range" id="bgOpacity" min="0" max="1" step="0.05" value="1" style="width:65px" oninput="updateBgOpacity(this.value); pushRealTimePreviewSync();" onchange="saveHistoryState()">
+            </div>
+            <input type="file" id="bgInput" hidden accept="image/*" onchange="handleBgUpload(event)">
+        </div>
+
+        <div class="tool-section">
+            <label>Add Dynamic Elements</label>
+            <div class="row">
+                <button onclick="addText()">+ Add Text Block</button>
+                <button onclick="document.getElementById('imgInput').click()">+ Add Image Element</button>
+            </div>
+            <input type="file" id="imgInput" hidden accept="image/*" onchange="handleImageUpload(event)">
+        </div>
+
+        <div class="tool-section">
+            <label>Text Customization Parameters</label>
+            <div class="row">
+                <select id="fontFamily" onchange="applySpanStyle('fontFamily', this.value)" style="width:115px;">
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Oswald">Oswald</option>
+                    <option value="Bebas Neue">Bebas Neue</option>
+                    <option value="Playfair Display">Playfair Display</option>
+                    <option value="Quicksand">Quicksand</option>
+                    <option value="Ubuntu">Ubuntu</option>
+                </select>
+                <input type="number" id="fontSize" value="18" style="width:45px" onchange="applySpanStyle('fontSize', this.value + 'px')">
+                <input type="color" id="fontColor" value="#000000" onchange="applySpanStyle('color', this.value)">
+            </div>
+            <div class="row">
+                <button class="secondary icon-btn" onclick="updateTextAlignment('left')" title="Align Left">←</button>
+                <button class="secondary icon-btn" onclick="updateTextAlignment('center')" title="Align Center">↔</button>
+                <button class="secondary icon-btn" onclick="updateTextAlignment('right')" title="Align Right">→</button>
+                <button class="secondary icon-btn" onclick="execTextCmd('bold')" title="Bold Style">B</button>
+                <button class="secondary icon-btn" style="font-style:italic;" onclick="execTextCmd('italic')" title="Italic Style">I</button>
+                <button class="secondary icon-btn" style="text-decoration:underline;" onclick="execTextCmd('underline')" title="Underline Text Profile">U</button>
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <label>Image Mask Frames & Panning Toggle Suite</label>
+            <div class="row">
+                <button class="secondary" onclick="applyImageFrameShape('square')">Square</button>
+                <button class="secondary" onclick="applyImageFrameShape('rounded')">Rounded</button>
+                <button class="secondary" onclick="applyImageFrameShape('circle')">Circle</button>
+            </div>
+            <div class="row" style="margin-top: 2px; gap: 4px;">
+                <div style="display:flex; flex-direction:column; gap:1px;">
+                    <span style="font-size:9px; font-weight:bold; color:#64748b;">PAN X:</span>
+                    <input type="range" id="imgPanX" min="0" max="100" value="50" style="width:55px;" oninput="updateImagePanningCoords(); pushRealTimePreviewSync();" onchange="saveHistoryState()">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:1px;">
+                    <span style="font-size:9px; font-weight:bold; color:#64748b;">PAN Y:</span>
+                    <input type="range" id="imgPanY" min="0" max="100" value="50" style="width:55px;" oninput="updateImagePanningCoords(); pushRealTimePreviewSync();" onchange="saveHistoryState()">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:1px;">
+                    <span style="font-size:9px; font-weight:bold; color:#64748b;">OPACITY:</span>
+                    <input type="range" id="elOpacity" min="0" max="1" step="0.05" value="1" style="width:55px;" oninput="updateElementOpacity(this.value); pushRealTimePreviewSync();" onchange="saveHistoryState()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Alignment Toggle & Copy/Paste/Delete Section -->
+        <div class="tool-section">
+            <label>Element Controls</label>
+            <div class="row">
+                <button class="success" onclick="copyElement()" title="Copy selected element (Ctrl+C)">📄 Copy</button>
+                <button class="purple" onclick="pasteElement()" title="Paste copied element (Ctrl+V)">📋 Paste</button>
+                <button class="danger" onclick="deleteElement()" title="Delete selected element (Del)">🗑️ Delete</button>
+            </div>
+            <div class="row" style="margin-top: 4px; align-items: center;">
+                <label style="font-weight:normal; text-transform:none; margin: 0;">Smart Guides:</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="alignmentToggle" checked onchange="toggleAlignmentGuides()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <label>Production Output Channels</label>
+            <div class="row">
+                <button class="success" onclick="downloadHDCard()">Download HD PNG</button>
+                <button class="purple" onclick="printCard()">Print Workspace Layout</button>
+            </div>
+            <div class="row">
+                <button class="dark" onclick="toggleLayersDrawer()">Elements Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-area">
+        <div id="id-card">
+            <div id="id-card-bg"></div>
+            <!-- Alignment guides -->
+            <div id="align-guide-v-center" class="alignment-guide vertical"></div>
+            <div id="align-guide-h-center" class="alignment-guide horizontal"></div>
+            <div id="align-guide-v-left" class="alignment-guide vertical"></div>
+            <div id="align-guide-v-right" class="alignment-guide vertical"></div>
+            <div id="align-guide-h-top" class="alignment-guide horizontal"></div>
+            <div id="align-guide-h-bottom" class="alignment-guide horizontal"></div>
+        </div>
+    </div>
+
+    <div id="layers-drawer" class="drawer-panel">
+        <div class="drawer-header">
+            <h3>Canvas Elements Layer Monitor</h3>
+            <button class="close-btn" onclick="toggleLayersDrawer()">×</button>
+        </div>
+        <div id="layers-list-items" class="layers-list"></div>
+    </div>
+
+    <!-- Templates Sandbox Dashboard -->
+    <div class="templates-section">
+        <div class="templates-header-row">
+            <h2>Saved System Blueprints Dashboard Workspace</h2>
+            <div id="backend-status" class="backend-status-pill offline">
+                <span id="backend-status-dot">●</span> <span id="backend-status-text">Local Storage Mode</span>
+            </div>
+        </div>
+
+        <!-- Section 1: Approved Public Templates -->
+        <div class="templates-sub-header">
+            <span>⭐ Approved Public ID Card Templates</span>
+        </div>
+        <div id="approved-templates-list" class="templates-grid"></div>
+
+        <!-- Section 2: User Personal Saved Templates -->
+        <div class="templates-sub-header">
+            <span>📂 My ID Cards & Saved Templates</span>
+        </div>
+        <div id="user-templates-list" class="templates-grid"></div>
+
+        <div id="pagination-controls" class="pagination-container" style="display: none;">
+            <button id="btn-load-more" class="purple" onclick="loadMoreBackendTemplates()" style="padding: 10px 22px; font-weight: bold;">
+                🔄 Show More My Blueprints
+            </button>
+        </div>
+    </div>
+
+    <!-- User Account Modal Popup -->
+    <div id="account-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-btn" style="position: absolute; top: 15px; right: 15px;" onclick="closeModal('account-modal')">×</button>
+            <div class="modal-tabs">
+                <button id="tab-btn-login" class="modal-tab-btn active" onclick="switchAuthTab('login')">Login</button>
+                <button id="tab-btn-register" class="modal-tab-btn" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login View -->
+            <div id="auth-view-login">
+                <h2>Login into Existing Account</h2>
+                <div class="form-group">
+                    <label>Username or Email</label>
+                    <input type="text" id="login-identifier" placeholder="Enter username or email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password">
+                </div>
+                <button style="width: 100%; padding: 12px; margin-top: 10px; font-weight: bold;" onclick="handleUserLogin()">Login Account</button>
+                <div style="text-align: center; margin-top: 12px;">
+                    <a href="javascript:void(0)" onclick="switchAuthTab('forgot')" style="font-size: 12px; color: var(--primary); font-weight: 600; text-decoration: none;">Forgot Password?</a>
+                </div>
+            </div>
+
+            <!-- Register View -->
+            <div id="auth-view-register" style="display: none;">
+                <h2>Create New Account</h2>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="reg-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="reg-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" placeholder="Choose a secure password">
+                </div>
+                <button class="success" style="width: 100%; padding: 12px; margin-top: 10px; font-weight: bold;" onclick="handleUserRegistration()">Create Account</button>
+            </div>
+
+            <!-- Forgot Password OTP View -->
+            <div id="auth-view-forgot" style="display: none;">
+                <h2>Reset Password via OTP</h2>
+                <div id="otp-step-1">
+                    <div class="form-group">
+                        <label>Username or Email</label>
+                        <input type="text" id="reset-identifier" placeholder="Enter username or registered email">
+                    </div>
+                    <button class="purple" style="width: 100%; padding: 12px; margin-top: 10px; font-weight: bold;" onclick="handleRequestOTP()">Send Reset OTP Code</button>
+                </div>
+                <div id="otp-step-2" style="display: none;">
+                    <div class="form-group">
+                        <label>OTP Code (Check Email)</label>
+                        <input type="text" id="reset-otp" placeholder="Enter 6-digit OTP">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="reset-new-password" placeholder="Enter new password">
+                    </div>
+                    <button class="success" style="width: 100%; padding: 12px; margin-top: 10px; font-weight: bold;" onclick="handleResetPasswordSubmit()">Confirm Password Change</button>
+                </div>
+            </div>
+
+            <!-- Profile View (When Logged In) -->
+            <div id="auth-view-profile" style="display: none; text-align: center;">
+                <h2>User Profile Session</h2>
+                <p style="font-size: 14px; color: #475569;">Logged in as: <strong id="profile-username-val">User</strong></p>
+                <p style="font-size: 12px; color: #64748b;" id="profile-email-val">email@example.com</p>
+                <button class="danger" style="width: 100%; padding: 10px; margin-top: 20px; font-weight: bold;" onclick="handleUserLogout()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal Popup -->
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-btn" style="position: absolute; top: 15px; right: 15px;" onclick="closeModal('admin-modal')">×</button>
+            <h2>🔑 Admin Mode Authentication</h2>
+            <div class="form-group">
+                <label>Admin Username</label>
+                <input type="text" id="admin-user" placeholder="Enter admin username">
+            </div>
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="admin-email" placeholder="Enter admin email">
+            </div>
+            <div class="form-group">
+                <label>Admin Password</label>
+                <input type="password" id="admin-pass" placeholder="Enter admin password">
+            </div>
+            <button class="dark" style="width: 100%; padding: 12px; margin-top: 10px; font-weight: bold;" onclick="handleAdminLogin()">Authenticate Admin Access</button>
+        </div>
+    </div>
+
+    <input type="file" id="replaceLayerImgInput" hidden accept="image/*" onchange="handleLayerImageReplacement(event)">
+
+    <script>
+        // =========================================================================
+        // GOOGLE APPS SCRIPT BACKEND API CONFIGURATION
+        // =========================================================================
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgWodGY8trbaaVfJcxCoCiGB1CTSzo3WIIHDwe31lPm_t0HmXQKwUdVuBGSJ5QTZe0yQ/exec";
+
+        const card = document.getElementById('id-card');
+        const cardBg = document.getElementById('id-card-bg');
+        let selectedElement = null;
+        let imageReplacementIndexTarget = null;
+        
+        let cardBgImageData = null;
+        let currentActiveTemplateUid = null;
+
+        let undoStack = [];
+        let redoStack = [];
+
+        let copiedElementData = null;
+        let alignmentGuidesEnabled = true;
+
+        // User & Admin Authentication State
+        let currentUserSession = null; // { username, email, isAdmin }
+        let targetResetEmail = "";
+
+        // Backend Sync & Pagination Tracking
+        let isBackendConnected = false;
+        let loadedApprovedStore = [];
+        let loadedUserStore = [];
+        let currentBackendOffset = 0;
+        const BACKEND_PAGE_LIMIT = 6;
+        let hasMoreBackendData = false;
+
+        // Avatar Icon Long-Press Timer Variables (10 Seconds)
+        let avatarPressTimer = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            saveHistoryState(true);
+            setupAvatarLongPressHandler();
+            initializeStorageBackend();
+
+            // Hotkey Shortcuts Handler
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    saveActiveWorkspaceChanges();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+                    if (selectedElement && !isEditingText()) {
+                        e.preventDefault();
+                        copyElement();
+                    }
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+                    if (!isEditingText()) {
+                        e.preventDefault();
+                        pasteElement();
+                    }
+                }
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    if (selectedElement && !isEditingText()) {
+                        e.preventDefault();
+                        deleteElement();
+                    }
+                }
+            });
+        });
+
+        // --- LONG PRESS AVATAR DETECTOR (10 Seconds for Admin Login) ---
+        function setupAvatarLongPressHandler() {
+            const avatarBtn = document.getElementById('user-avatar-trigger');
+
+            const startPress = () => {
+                avatarPressTimer = setTimeout(() => {
+                    openModal('admin-modal');
+                    showFeedbackNotice("Admin authentication mode triggered!");
+                }, 10000); // 10,000 ms = 10 Seconds
+            };
+
+            const cancelPress = () => {
+                if (avatarPressTimer) {
+                    clearTimeout(avatarPressTimer);
+                    avatarPressTimer = null;
+                }
+            };
+
+            avatarBtn.addEventListener('mousedown', startPress);
+            avatarBtn.addEventListener('mouseup', cancelPress);
+            avatarBtn.addEventListener('mouseleave', cancelPress);
+
+            avatarBtn.addEventListener('touchstart', startPress);
+            avatarBtn.addEventListener('touchend', cancelPress);
+
+            avatarBtn.addEventListener('click', () => {
+                if (currentUserSession) {
+                    document.getElementById('profile-username-val').innerText = currentUserSession.username;
+                    document.getElementById('profile-email-val').innerText = currentUserSession.email || 'Admin Mode';
+                    switchAuthTab('profile');
+                } else {
+                    switchAuthTab('login');
+                }
+                openModal('account-modal');
+            });
+        }
+
+        // --- BACKEND API COMMUNICATION LAYER ---
+        async function callBackendApi(payload) {
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.trim() === "" || APPS_SCRIPT_URL.includes("YOUR_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+                return null;
+            }
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error("HTTP error " + response.status);
+                return await response.json();
+            } catch (err) {
+                console.warn("Backend API request error:", err);
+                return null;
+            }
+        }
+
+        async function initializeStorageBackend() {
+            updateBackendStatusPill("Connecting to Backend...", false);
+            
+            const initRes = await callBackendApi({ action: 'init' });
+            if (initRes && initRes.success) {
+                isBackendConnected = true;
+                updateBackendStatusPill("Google Sheets Connected", true);
+                fetchTemplatesFromBackend(0, true);
+            } else {
+                isBackendConnected = false;
+                updateBackendStatusPill("Local Storage Mode", false);
+                renderTemplatesList();
+            }
+        }
+
+        function updateBackendStatusPill(label, isOnline) {
+            const statusBox = document.getElementById('backend-status');
+            const statusText = document.getElementById('backend-status-text');
+            statusText.innerText = label;
+            statusBox.className = isOnline ? "backend-status-pill online" : "backend-status-pill offline";
+        }
+
+        async function fetchTemplatesFromBackend(offset = 0, resetList = false) {
+            const res = await callBackendApi({
+                action: 'load',
+                username: currentUserSession ? currentUserSession.username : null,
+                isAdmin: currentUserSession ? currentUserSession.isAdmin : false,
+                offset: offset,
+                limit: BACKEND_PAGE_LIMIT
+            });
+
+            if (res && res.success) {
+                loadedApprovedStore = res.approvedTemplates || [];
+                if (resetList) {
+                    loadedUserStore = res.userTemplates || [];
+                } else {
+                    loadedUserStore = loadedUserStore.concat(res.userTemplates || []);
+                }
+
+                currentBackendOffset = offset + (res.userTemplates ? res.userTemplates.length : 0);
+                hasMoreBackendData = res.hasMore;
+
+                renderTemplatesList();
+            } else {
+                renderTemplatesList();
+            }
+        }
+
+        async function loadMoreBackendTemplates() {
+            if (!isBackendConnected || !hasMoreBackendData) return;
+            const btn = document.getElementById('btn-load-more');
+            btn.innerText = "⏳ Loading...";
+            btn.disabled = true;
+
+            await fetchTemplatesFromBackend(currentBackendOffset, false);
+
+            btn.innerText = "🔄 Show More My Blueprints";
+            btn.disabled = false;
+        }
+
+        // --- AUTHENTICATION & MODAL CONTROLLERS ---
+        function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+        function switchAuthTab(tab) {
+            document.getElementById('auth-view-login').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('auth-view-register').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('auth-view-forgot').style.display = tab === 'forgot' ? 'block' : 'none';
+            document.getElementById('auth-view-profile').style.display = tab === 'profile' ? 'block' : 'none';
+
+            document.getElementById('tab-btn-login').className = tab === 'login' ? 'modal-tab-btn active' : 'modal-tab-btn';
+            document.getElementById('tab-btn-register').className = tab === 'register' ? 'modal-tab-btn active' : 'modal-tab-btn';
+        }
+
+        async function handleUserRegistration() {
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            if (!username || !email || !password) {
+                alert("Please fill in all registration fields.");
+                return;
+            }
+
+            const res = await callBackendApi({ action: 'register', user: { username, email, password } });
+            if (res && res.success) {
+                alert("Account created successfully! Logging you in...");
+                currentUserSession = { username: res.username, email: res.email, isAdmin: false };
+                updateHeaderUserDisplay();
+                closeModal('account-modal');
+                fetchTemplatesFromBackend(0, true);
+            } else {
+                alert(res ? res.message : "Registration failed. Check internet connection.");
+            }
+        }
+
+        async function handleUserLogin() {
+            const identifier = document.getElementById('login-identifier').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!identifier || !password) {
+                alert("Please enter username/email and password.");
+                return;
+            }
+
+            const res = await callBackendApi({ action: 'login', credentials: { identifier, password } });
+            if (res && res.success) {
+                currentUserSession = { username: res.username, email: res.email, isAdmin: false };
+                updateHeaderUserDisplay();
+                closeModal('account-modal');
+                fetchTemplatesFromBackend(0, true);
+                showFeedbackNotice(`Welcome back, ${res.username}!`);
+            } else {
+                alert(res ? res.message : "Invalid login credentials.");
+            }
+        }
+
+        async function handleAdminLogin() {
+            const username = document.getElementById('admin-user').value.trim();
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-pass').value;
+
+            const res = await callBackendApi({ action: 'admin_login', credentials: { username, email, password } });
+            if (res && res.success) {
+                currentUserSession = { username: "ADMIN", email: email, isAdmin: true };
+                updateHeaderUserDisplay();
+                closeModal('admin-modal');
+                fetchTemplatesFromBackend(0, true);
+                showFeedbackNotice("ADMIN MODE ENABLED! You can publish Approved Public Templates.");
+            } else {
+                alert(res ? res.message : "Admin authentication failed.");
+            }
+        }
+
+        async function handleRequestOTP() {
+            const identifier = document.getElementById('reset-identifier').value.trim();
+            if (!identifier) { alert("Enter username or email."); return; }
+
+            const res = await callBackendApi({ action: 'request_otp', identifier: identifier });
+            if (res && res.success) {
+                targetResetEmail = res.email;
+                document.getElementById('otp-step-1').style.display = 'none';
+                document.getElementById('otp-step-2').style.display = 'block';
+                showFeedbackNotice(res.message);
+            } else {
+                alert(res ? res.message : "Failed to send OTP.");
+            }
+        }
+
+        async function handleResetPasswordSubmit() {
+            const otp = document.getElementById('reset-otp').value.trim();
+            const newPassword = document.getElementById('reset-new-password').value;
+
+            const res = await callBackendApi({
+                action: 'reset_password_otp',
+                resetData: { email: targetResetEmail, otp: otp, newPassword: newPassword }
+            });
+
+            if (res && res.success) {
+                alert(res.message);
+                document.getElementById('otp-step-1').style.display = 'block';
+                document.getElementById('otp-step-2').style.display = 'none';
+                switchAuthTab('login');
+            } else {
+                alert(res ? res.message : "Password reset failed.");
+            }
+        }
+
+        function handleUserLogout() {
+            currentUserSession = null;
+            updateHeaderUserDisplay();
+            closeModal('account-modal');
+            fetchTemplatesFromBackend(0, true);
+            showFeedbackNotice("Signed out successfully.");
+        }
+
+        function updateHeaderUserDisplay() {
+            const statusLabel = document.getElementById('account-status-label');
+            const adminIndicator = document.getElementById('admin-indicator');
+
+            if (currentUserSession) {
+                if (currentUserSession.isAdmin) {
+                    statusLabel.innerText = "Admin Mode";
+                    adminIndicator.style.display = "block";
+                } else {
+                    statusLabel.innerText = currentUserSession.username;
+                    adminIndicator.style.display = "none";
+                }
+            } else {
+                statusLabel.innerText = "Guest Mode";
+                adminIndicator.style.display = "none";
+            }
+        }
+
+        // --- CREATE NEW BLANK ID CARD ---
+        function createNewBlankCardWorkspace() {
+            if (card.querySelectorAll('.element').length > 0) {
+                if (!confirm("Start a new ID card? Any unsaved changes on the canvas will be cleared.")) return;
+            }
+
+            card.querySelectorAll('.element').forEach(el => el.remove());
+            selectedElement = null;
+            currentActiveTemplateUid = null;
+
+            cardBgImageData = null;
+            cardBg.style.backgroundImage = 'none';
+            cardBg.style.backgroundColor = '#ffffff';
+            cardBg.style.opacity = '1';
+            document.getElementById('bgColor').value = '#ffffff';
+            document.getElementById('bgOpacity').value = '1';
+
+            document.getElementById('cardW').value = '450';
+            document.getElementById('cardH').value = '280';
+            updateCardSize();
+
+            refreshLayersListPanel();
+            saveHistoryState();
+            renderTemplatesList();
+            showFeedbackNotice("New blank ID card workspace ready!");
+        }
+
+        // --- Save Operations Control Management Module ---
+        async function saveActiveWorkspaceChanges() {
+            if (currentActiveTemplateUid !== null) {
+                const activeLabel = getActiveTemplateLabel() || ("Template #" + currentActiveTemplateUid);
+                const templateObjectPayload = constructTemplateObject(currentActiveTemplateUid, activeLabel);
+
+                if (isBackendConnected) {
+                    showFeedbackNotice("Saving changes to backend...");
+                    const res = await callBackendApi({
+                        action: 'save',
+                        template: templateObjectPayload,
+                        userToken: currentUserSession
+                    });
+
+                    if (res && res.success) {
+                        if (res.uid) currentActiveTemplateUid = res.uid;
+                        fetchTemplatesFromBackend(0, true);
+                        showFeedbackNotice(res.message || "Template changes saved to backend!");
+                    } else {
+                        showFeedbackNotice("Failed to update backend. Saved locally.");
+                        saveToLocalStorage(templateObjectPayload);
+                    }
+                } else {
+                    saveToLocalStorage(templateObjectPayload);
+                    renderTemplatesList();
+                    showFeedbackNotice("Active workspace template saved locally.");
+                }
+            } else {
+                createNewTemplateBlueprint();
+            }
+        }
+
+        async function createNewTemplateBlueprint() {
+            const blueprintLabelInput = prompt("Enter a unique name for this ID card template:", "Custom Template #" + Math.floor(100 + Math.random() * 900));
+            if (!blueprintLabelInput) return;
+
+            const freshlyGeneratedUid = Date.now();
+            const templateObjectPayload = constructTemplateObject(freshlyGeneratedUid, blueprintLabelInput);
+
+            currentActiveTemplateUid = freshlyGeneratedUid;
+
+            if (isBackendConnected) {
+                showFeedbackNotice("Saving new template to backend...");
+                const res = await callBackendApi({
+                    action: 'save',
+                    template: templateObjectPayload,
+                    userToken: currentUserSession
+                });
+
+                if (res && res.success) {
+                    if (res.uid) currentActiveTemplateUid = res.uid;
+                    fetchTemplatesFromBackend(0, true);
+                    showFeedbackNotice(res.message || "Template saved successfully!");
+                } else {
+                    saveToLocalStorage(templateObjectPayload);
+                    renderTemplatesList();
+                    showFeedbackNotice("Saved blueprint to local storage.");
+                }
+            } else {
+                saveToLocalStorage(templateObjectPayload);
+                renderTemplatesList();
+                showFeedbackNotice("Successfully generated design template!");
+            }
+        }
+
+        function constructTemplateObject(uid, label) {
+            return {
+                uid: uid,
+                label: label,
+                dimensions: {
+                    w: document.getElementById('cardW').value,
+                    h: document.getElementById('cardH').value
+                },
+                backgroundStyles: {
+                    color: cardBg.style.backgroundColor || 'white',
+                    imageSource: cardBgImageData || 'none',
+                    opacity: cardBg.style.opacity || '1'
+                },
+                elementsDataset: parseCanvasElementsToArray()
+            };
+        }
+
+        function getActiveTemplateLabel() {
+            const store = isBackendConnected ? loadedUserStore.concat(loadedApprovedStore) : JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+            const found = store.find(b => String(b.uid) === String(currentActiveTemplateUid));
+            return found ? found.label : null;
+        }
+
+        function saveToLocalStorage(templateObj) {
+            let localList = JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+            const idx = localList.findIndex(b => String(b.uid) === String(templateObj.uid));
+            if (idx !== -1) {
+                localList[idx] = templateObj;
+            } else {
+                localList.push(templateObj);
+            }
+            localStorage.setItem('app_id_card_blueprints_v2', JSON.stringify(localList));
+        }
+
+        function isEditingText() {
+            const activeEl = document.activeElement;
+            return activeEl && (activeEl.getAttribute('contenteditable') === 'true' || activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+        }
+
+        // --- Copy/Paste/Delete Functions ---
+        function copyElement() {
+            if (!selectedElement) {
+                showFeedbackNotice("No element selected to copy.");
+                return;
+            }
+
+            const imgNode = selectedElement.querySelector('img');
+            const isImgType = !!imgNode;
+            const style = window.getComputedStyle(selectedElement);
+
+            copiedElementData = {
+                type: isImgType ? 'image' : 'text',
+                innerPayload: isImgType ? imgNode.src : selectedElement.querySelector('.text-content').innerHTML,
+                left: selectedElement.style.left,
+                top: selectedElement.style.top,
+                width: selectedElement.style.width,
+                height: selectedElement.style.height,
+                baseFontFamily: style.fontFamily,
+                baseFontSize: style.fontSize,
+                baseColor: style.color,
+                opacity: selectedElement.style.opacity || '1',
+                borderRadius: selectedElement.style.borderRadius || '0px',
+                textAlign: selectedElement.style.textAlign || 'center',
+                shape: selectedElement.getAttribute('data-shape') || 'square',
+                panX: selectedElement.getAttribute('data-pan-x') || '50',
+                panY: selectedElement.getAttribute('data-pan-y') || '50'
+            };
+
+            showFeedbackNotice("Element copied to clipboard!");
+        }
+
+        function pasteElement() {
+            if (!copiedElementData) {
+                showFeedbackNotice("No element to paste. Copy an element first.");
+                return;
+            }
+
+            const el = document.createElement('div');
+            el.className = 'element';
+            el.style.left = copiedElementData.left;
+            el.style.top = copiedElementData.top;
+            if (copiedElementData.width) el.style.width = copiedElementData.width;
+            if (copiedElementData.height) el.style.height = copiedElementData.height;
+            el.style.opacity = copiedElementData.opacity;
+            el.style.borderRadius = copiedElementData.borderRadius;
+            el.style.textAlign = copiedElementData.textAlign;
+            el.setAttribute('data-shape', copiedElementData.shape);
+            el.setAttribute('data-pan-x', copiedElementData.panX);
+            el.setAttribute('data-pan-y', copiedElementData.panY);
+
+            if (copiedElementData.type === 'text') {
+                el.style.fontFamily = copiedElementData.baseFontFamily;
+                el.style.fontSize = copiedElementData.baseFontSize;
+                el.style.color = copiedElementData.baseColor;
+                el.innerHTML = `
+                    <div class="text-content" contenteditable="true" style="text-align: ${copiedElementData.textAlign};">${copiedElementData.innerPayload}</div>
+                    <div class="resize-handle"></div>
+                `;
+            } else {
+                el.classList.add('image-element');
+                el.innerHTML = `
+                    <img src="${copiedElementData.innerPayload}" style="border-radius:inherit; object-position: ${copiedElementData.panX}% ${copiedElementData.panY}%;" />
+                    <div class="resize-handle"></div>
+                `;
+            }
+
+            initElement(el);
+            card.appendChild(el);
+            selectElement(el);
+            refreshLayersListPanel();
+            saveHistoryState();
+            pushRealTimePreviewSync();
+            showFeedbackNotice("Element pasted successfully!");
+        }
+
+        // --- Alignment Guide Toggle ---
+        function toggleAlignmentGuides() {
+            alignmentGuidesEnabled = document.getElementById('alignmentToggle').checked;
+            if (!alignmentGuidesEnabled) {
+                hideAllAlignmentGuides();
+            }
+        }
+
+        function hideAllAlignmentGuides() {
+            document.getElementById('align-guide-v-center').style.display = 'none';
+            document.getElementById('align-guide-h-center').style.display = 'none';
+            document.getElementById('align-guide-v-left').style.display = 'none';
+            document.getElementById('align-guide-v-right').style.display = 'none';
+            document.getElementById('align-guide-h-top').style.display = 'none';
+            document.getElementById('align-guide-h-bottom').style.display = 'none';
+        }
+
+        // --- Advanced Alignment Detection System ---
+        function checkAlignmentGuides(draggedElement) {
+            if (!alignmentGuidesEnabled) {
+                hideAllAlignmentGuides();
+                return;
+            }
+
+            const snapThreshold = 6;
+            const cardWidth = card.offsetWidth;
+            const cardHeight = card.offsetHeight;
+
+            const draggedRect = {
+                left: draggedElement.offsetLeft,
+                top: draggedElement.offsetTop,
+                right: draggedElement.offsetLeft + draggedElement.offsetWidth,
+                bottom: draggedElement.offsetTop + draggedElement.offsetHeight,
+                centerX: draggedElement.offsetLeft + draggedElement.offsetWidth / 2,
+                centerY: draggedElement.offsetTop + draggedElement.offsetHeight / 2,
+                width: draggedElement.offsetWidth,
+                height: draggedElement.offsetHeight
+            };
+
+            const cardCenterX = cardWidth / 2;
+            const cardCenterY = cardHeight / 2;
+
+            let snappedX = null;
+            let snappedY = null;
+            let showVCenter = false, showHCenter = false;
+            let showVLeft = false, showVRight = false, showHTop = false, showHBottom = false;
+
+            if (Math.abs(draggedRect.centerX - cardCenterX) < snapThreshold) {
+                snappedX = cardCenterX - draggedElement.offsetWidth / 2;
+                showVCenter = true;
+            }
+            if (Math.abs(draggedRect.centerY - cardCenterY) < snapThreshold) {
+                snappedY = cardCenterY - draggedElement.offsetHeight / 2;
+                showHCenter = true;
+            }
+
+            const otherElements = Array.from(card.querySelectorAll('.element')).filter(el => el !== draggedElement);
+
+            otherElements.forEach(otherEl => {
+                const otherRect = {
+                    left: otherEl.offsetLeft,
+                    top: otherEl.offsetTop,
+                    right: otherEl.offsetLeft + otherEl.offsetWidth,
+                    bottom: otherEl.offsetTop + otherEl.offsetHeight,
+                    centerX: otherEl.offsetLeft + otherEl.offsetWidth / 2,
+                    centerY: otherEl.offsetTop + otherEl.offsetHeight / 2
+                };
+
+                if (Math.abs(draggedRect.left - otherRect.left) < snapThreshold) {
+                    snappedX = otherRect.left;
+                    showVLeft = true;
+                    document.getElementById('align-guide-v-left').style.left = otherRect.left + 'px';
+                }
+                if (Math.abs(draggedRect.right - otherRect.right) < snapThreshold) {
+                    snappedX = otherRect.right - draggedElement.offsetWidth;
+                    showVRight = true;
+                    document.getElementById('align-guide-v-right').style.left = otherRect.right + 'px';
+                }
+                if (Math.abs(draggedRect.centerX - otherRect.centerX) < snapThreshold) {
+                    snappedX = otherRect.centerX - draggedElement.offsetWidth / 2;
+                    showVCenter = true;
+                    document.getElementById('align-guide-v-center').style.left = otherRect.centerX + 'px';
+                }
+
+                if (Math.abs(draggedRect.top - otherRect.top) < snapThreshold) {
+                    snappedY = otherRect.top;
+                    showHTop = true;
+                    document.getElementById('align-guide-h-top').style.top = otherRect.top + 'px';
+                }
+                if (Math.abs(draggedRect.bottom - otherRect.bottom) < snapThreshold) {
+                    snappedY = otherRect.bottom - draggedElement.offsetHeight;
+                    showHBottom = true;
+                    document.getElementById('align-guide-h-bottom').style.top = otherRect.bottom + 'px';
+                }
+                if (Math.abs(draggedRect.centerY - otherRect.centerY) < snapThreshold) {
+                    snappedY = otherRect.centerY - draggedElement.offsetHeight / 2;
+                    showHCenter = true;
+                    document.getElementById('align-guide-h-center').style.top = otherRect.centerY + 'px';
+                }
+            });
+
+            if (snappedX !== null) draggedElement.style.left = snappedX + 'px';
+            if (snappedY !== null) draggedElement.style.top = snappedY + 'px';
+
+            document.getElementById('align-guide-v-center').style.display = showVCenter ? 'block' : 'none';
+            if (showVCenter && snappedX === null) document.getElementById('align-guide-v-center').style.left = cardCenterX + 'px';
+            
+            document.getElementById('align-guide-h-center').style.display = showHCenter ? 'block' : 'none';
+            if (showHCenter && snappedY === null) document.getElementById('align-guide-h-center').style.top = cardCenterY + 'px';
+            
+            document.getElementById('align-guide-v-left').style.display = showVLeft ? 'block' : 'none';
+            document.getElementById('align-guide-v-right').style.display = showVRight ? 'block' : 'none';
+            document.getElementById('align-guide-h-top').style.display = showHTop ? 'block' : 'none';
+            document.getElementById('align-guide-h-bottom').style.display = showHBottom ? 'block' : 'none';
+        }
+
+        // --- HTML to Formatted Text Segments Parser ---
+        function parseHTMLToSegments(htmlContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            
+            const segments = [];
+            
+            function traverse(node, inheritedStyles = {}) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (text) {
+                        segments.push({
+                            text: text,
+                            ...inheritedStyles
+                        });
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = node.tagName.toLowerCase();
+                    const newStyles = {...inheritedStyles};
+                    
+                    if (tagName === 'b' || tagName === 'strong') newStyles.bold = true;
+                    if (tagName === 'i' || tagName === 'em') newStyles.italic = true;
+                    if (tagName === 'u') newStyles.underline = true;
+                    
+                    const style = node.style;
+                    if (style) {
+                        if (style.fontWeight === 'bold') newStyles.bold = true;
+                        if (style.fontWeight === 'normal') newStyles.bold = false;
+                        if (style.fontStyle === 'italic') newStyles.italic = true;
+                        if (style.fontStyle === 'normal') newStyles.italic = false;
+                        if (style.textDecoration === 'underline') newStyles.underline = true;
+                        
+                        if (style.fontFamily) newStyles.fontFamily = style.fontFamily;
+                        if (style.fontSize) newStyles.fontSize = style.fontSize;
+                        if (style.color) newStyles.color = style.color;
+                    }
+                    
+                    if (tagName === 'br') {
+                        segments.push({ text: '\n' });
+                    } else {
+                        for (let child of node.childNodes) {
+                            traverse(child, newStyles);
+                        }
+                    }
+                }
+            }
+            
+            traverse(tempDiv);
+            return segments;
+        }
+
+        // --- Core Real-Time Preview Synchronization ---
+        function pushRealTimePreviewSync() {
+            if (currentActiveTemplateUid === null) return;
+            
+            let currentList = isBackendConnected ? loadedUserStore.concat(loadedApprovedStore) : JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+            const idx = currentList.findIndex(b => String(b.uid) === String(currentActiveTemplateUid));
+            
+            if (idx !== -1) {
+                currentList[idx].dimensions = {
+                    w: document.getElementById('cardW').value,
+                    h: document.getElementById('cardH').value
+                };
+                currentList[idx].backgroundStyles = {
+                    color: cardBg.style.backgroundColor || 'white',
+                    imageSource: cardBgImageData || 'none',
+                    opacity: cardBg.style.opacity || '1'
+                };
+                currentList[idx].elementsDataset = parseCanvasElementsToArray();
+                
+                if (!isBackendConnected) {
+                    localStorage.setItem('app_id_card_blueprints_v2', JSON.stringify(currentList));
+                }
+                
+                const targetPreviewBox = document.getElementById(`preview-box-container-${currentActiveTemplateUid}`);
+                if (targetPreviewBox) {
+                    injectLiveMirrorCloneToBox(targetPreviewBox, currentList[idx]);
+                }
+            }
+        }
+
+        function injectLiveMirrorCloneToBox(boxContainerNode, blueprintData) {
+            boxContainerNode.innerHTML = '';
+            
+            const fixedBoundWidth = 180;
+            const scaleDownRatio = fixedBoundWidth / parseFloat(blueprintData.dimensions.w);
+            const calculatedFrameHeight = parseFloat(blueprintData.dimensions.h) * scaleDownRatio;
+            
+            boxContainerNode.style.width = fixedBoundWidth + 'px';
+            boxContainerNode.style.height = calculatedFrameHeight + 'px';
+
+            const mirrorShell = document.createElement('div');
+            mirrorShell.className = 'preview-scaled-mirror-root';
+            mirrorShell.style.width = blueprintData.dimensions.w + 'px';
+            mirrorShell.style.height = blueprintData.dimensions.h + 'px';
+            mirrorShell.style.transform = `scale(${scaleDownRatio})`;
+            
+            const mirrorBg = document.createElement('div');
+            mirrorBg.style.position = 'absolute';
+            mirrorBg.style.top = '0';
+            mirrorBg.style.left = '0';
+            mirrorBg.style.right = '0';
+            mirrorBg.style.bottom = '0';
+            mirrorBg.style.backgroundColor = blueprintData.backgroundStyles.color;
+            if (blueprintData.backgroundStyles.imageSource !== 'none') {
+                mirrorBg.style.backgroundImage = `url('${blueprintData.backgroundStyles.imageSource}')`;
+                mirrorBg.style.backgroundSize = 'cover';
+                mirrorBg.style.backgroundPosition = 'center';
+            }
+            mirrorBg.style.opacity = blueprintData.backgroundStyles.opacity;
+            mirrorShell.appendChild(mirrorBg);
+
+            (blueprintData.elementsDataset || []).forEach(compData => {
+                const node = document.createElement('div');
+                node.className = 'element';
+                if (compData.type === 'image') {
+                    node.classList.add('image-element');
+                }
+                node.style.position = 'absolute';
+                node.style.left = compData.left;
+                node.style.top = compData.top;
+                if(compData.width) node.style.width = compData.width;
+                if(compData.height) node.style.height = compData.height;
+                node.style.opacity = compData.opacity;
+                node.style.borderRadius = compData.borderRadius || '0px';
+                node.style.textAlign = compData.textAlign || 'center';
+
+                if (compData.type === 'text') {
+                    node.style.fontSize = compData.baseFontSize || compData.fontSize;
+                    node.style.fontFamily = compData.baseFontFamily || compData.fontFamily;
+                    node.style.color = compData.baseColor || compData.color;
+                    node.innerHTML = `<div class="text-content" style="text-align: ${compData.textAlign || 'center'};">${compData.innerPayload}</div>`;
+                } else {
+                    node.innerHTML = `<img src="${compData.innerPayload}" style="width:100%; height:100%; border-radius:inherit; object-fit:cover; object-position: ${compData.panX || 50}% ${compData.panY || 50}%;" />`;
+                }
+                mirrorShell.appendChild(node);
+            });
+
+            boxContainerNode.appendChild(mirrorShell);
+        }
+
+        // --- High Definition Rendering System Engine ---
+        function generateHDCanvas(scaleFactor, callback) {
+            const priorSelectedElement = selectedElement;
+            if (selectedElement) selectedElement.classList.remove('active');
+
+            const origWidth = card.offsetWidth;
+            const origHeight = card.offsetHeight;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = origWidth * scaleFactor;
+            canvas.height = origHeight * scaleFactor;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scaleFactor, scaleFactor);
+
+            ctx.fillStyle = window.getComputedStyle(cardBg).backgroundColor || "#ffffff";
+            ctx.fillRect(0, 0, origWidth, origHeight);
+
+            const drawCardElements = () => {
+                const elements = card.querySelectorAll('.element');
+                let elementsToProcess = elements.length;
+
+                if (elementsToProcess === 0) {
+                    if (priorSelectedElement) priorSelectedElement.classList.add('active');
+                    callback(canvas);
+                    return;
+                }
+                
+                const onElementDrawn = () => {
+                    elementsToProcess--;
+                    if (elementsToProcess === 0) {
+                        if (priorSelectedElement) priorSelectedElement.classList.add('active');
+                        callback(canvas);
+                    }
+                }
+
+                elements.forEach(el => {
+                    ctx.save();
+                    ctx.globalAlpha = parseFloat(window.getComputedStyle(el).opacity || 1);
+
+                    const x = el.offsetLeft;
+                    const y = el.offsetTop;
+                    const w = el.offsetWidth;
+                    const h = el.offsetHeight;
+
+                    const imgNode = el.querySelector('img');
+                    if (imgNode) {
+                        const shape = el.getAttribute('data-shape') || 'square';
+                        const panX = parseFloat(el.getAttribute('data-pan-x') || 50);
+                        const panY = parseFloat(el.getAttribute('data-pan-y') || 50);
+                        
+                        const tempImg = new Image();
+                        tempImg.crossOrigin = "Anonymous";
+                        tempImg.onload = () => {
+                            ctx.save();
+                            ctx.beginPath();
+                            if (shape === 'circle') {
+                                ctx.arc(x + w/2, y + h/2, Math.min(w,h)/2, 0, Math.PI*2);
+                            } else if (shape === 'rounded') {
+                                const radius = parseFloat(window.getComputedStyle(el).borderRadius);
+                                ctx.moveTo(x + radius, y);
+                                ctx.lineTo(x + w - radius, y); ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+                                ctx.lineTo(x + w, y + h - radius); ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+                                ctx.lineTo(x + radius, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+                                ctx.lineTo(x, y + radius); ctx.quadraticCurveTo(x, y, x + radius, y);
+                            } else {
+                                ctx.rect(x, y, w, h);
+                            }
+                            ctx.closePath();
+                            ctx.clip();
+
+                            const imgRatio = tempImg.width / tempImg.height;
+                            const elementRatio = w / h;
+                            let sX = 0, sY = 0, sW = tempImg.width, sH = tempImg.height;
+
+                            if (imgRatio > elementRatio) {
+                                sW = tempImg.height * elementRatio;
+                                sX = (tempImg.width - sW) * (panX / 100);
+                            } else {
+                                sH = tempImg.width / elementRatio;
+                                sY = (tempImg.height - sH) * (panY / 100);
+                            }
+
+                            ctx.drawImage(tempImg, sX, sY, sW, sH, x, y, w, h);
+                            ctx.restore();
+                            ctx.restore();
+                            onElementDrawn();
+                        };
+                        tempImg.onerror = () => {
+                           console.error("Could not load image for rendering:", imgNode.src);
+                           onElementDrawn();
+                        }
+                        tempImg.src = imgNode.src;
+                    } else {
+                        const textContentNode = el.querySelector('.text-content');
+                        const style = window.getComputedStyle(el);
+
+                        const baseFontFamily = style.fontFamily;
+                        const baseFontSize = parseInt(style.fontSize);
+                        const baseColor = style.color;
+                        
+                        const alignment = style.textAlign || "center";
+                        const paddingLeft = 6;
+                        const paddingRight = 6;
+                        const paddingTop = 6;
+                        
+                        const htmlContent = textContentNode.innerHTML;
+                        const sanitizedHtml = htmlContent.replace(/<div>/g, '<br>').replace(/<\/div>/g, '').replace(/<p>/g, '<br>').replace(/<\/p>/g, '');
+                        const lines = sanitizedHtml.split(/<br\s*\/?>/i);
+                        
+                        const computedLineHeightOffset = baseFontSize * 1.2;
+                        let ongoingYOffset = y + paddingTop;
+
+                        lines.forEach(lineHTML => {
+                            const segments = parseHTMLToSegments(lineHTML);
+                            if (segments.length === 0 && lineHTML === '') {
+                                ongoingYOffset += computedLineHeightOffset;
+                                return;
+                            }
+                            
+                            let totalLineWidth = 0;
+                            segments.forEach(seg => {
+                                ctx.save();
+                                const segFontSize = seg.fontSize ? parseInt(seg.fontSize) : baseFontSize;
+                                const segFontFamily = seg.fontFamily || baseFontFamily;
+                                const fontWeight = seg.bold ? 'bold' : 'normal';
+                                const fontStyle = seg.italic ? 'italic' : 'normal';
+                                ctx.font = `${fontStyle} ${fontWeight} ${segFontSize}px ${segFontFamily}`;
+                                totalLineWidth += ctx.measureText(seg.text).width;
+                                ctx.restore();
+                            });
+
+                            let currentX = x + paddingLeft;
+                            if (alignment === "center") {
+                                currentX = x + (w / 2) - (totalLineWidth / 2);
+                            } else if (alignment === "right") {
+                                currentX = x + w - paddingRight - totalLineWidth;
+                            }
+
+                            segments.forEach(seg => {
+                                ctx.save();
+                                
+                                const segFontSize = seg.fontSize ? parseInt(seg.fontSize) : baseFontSize;
+                                const segFontFamily = seg.fontFamily || baseFontFamily;
+                                const segColor = seg.color || baseColor;
+                                const fontWeight = seg.bold ? 'bold' : 'normal';
+                                const fontStyle = seg.italic ? 'italic' : 'normal';
+                                
+                                ctx.fillStyle = segColor;
+                                ctx.font = `${fontStyle} ${fontWeight} ${segFontSize}px ${segFontFamily}`;
+                                ctx.textBaseline = "top";
+                                ctx.textAlign = "left";
+                                
+                                ctx.fillText(seg.text, currentX, ongoingYOffset);
+                                
+                                if (seg.underline) {
+                                    const textMetrics = ctx.measureText(seg.text);
+                                    ctx.strokeStyle = segColor;
+                                    ctx.lineWidth = Math.max(1, segFontSize / 14);
+                                    ctx.beginPath();
+                                    const underlineY = ongoingYOffset + segFontSize;
+                                    ctx.moveTo(currentX, underlineY);
+                                    ctx.lineTo(currentX + textMetrics.width, underlineY);
+                                    ctx.stroke();
+                                }
+                                
+                                currentX += ctx.measureText(seg.text).width;
+                                ctx.restore();
+                            });
+
+                            ongoingYOffset += computedLineHeightOffset;
+                        });
+
+                        ctx.restore();
+                        onElementDrawn();
+                    }
+                });
+            };
+
+            if (cardBgImageData) {
+                const bgImg = new Image();
+                bgImg.crossOrigin = "Anonymous";
+                bgImg.onload = () => {
+                    ctx.save();
+                    ctx.globalAlpha = parseFloat(window.getComputedStyle(cardBg).opacity || 1);
+                    ctx.drawImage(bgImg, 0, 0, origWidth, origHeight);
+                    ctx.restore();
+                    drawCardElements();
+                };
+                bgImg.onerror = () => {
+                    console.error("Could not load background image for rendering:", cardBgImageData);
+                    drawCardElements();
+                };
+                bgImg.src = cardBgImageData;
+            } else {
+                drawCardElements();
+            }
+        }
+
+        function downloadHDCard() {
+            generateHDCanvas(4, (hdCanvas) => {
+                const link = document.createElement('a');
+                link.download = 'high-definition-identity-card.png';
+                link.href = hdCanvas.toDataURL('image/png', 1.0);
+                link.click();
+            });
+        }
+
+        function parseCanvasElementsToArray() {
+            const outputArray = [];
+            const elementNodes = card.querySelectorAll('.element');
+            
+            elementNodes.forEach(el => {
+                const imgNode = el.querySelector('img');
+                const isImgType = !!imgNode;
+
+                const style = window.getComputedStyle(el);
+                
+                outputArray.push({
+                    type: isImgType ? 'image' : 'text',
+                    innerPayload: isImgType ? imgNode.src : el.querySelector('.text-content').innerHTML,
+                    left: el.style.left,
+                    top: el.style.top,
+                    width: el.style.width,
+                    height: el.style.height,
+                    baseFontFamily: style.fontFamily,
+                    baseFontSize: style.fontSize,
+                    baseColor: style.color,
+                    opacity: el.style.opacity || '1',
+                    borderRadius: el.style.borderRadius || '0px',
+                    textAlign: el.style.textAlign || 'center',
+                    shape: el.getAttribute('data-shape') || 'square',
+                    panX: el.getAttribute('data-pan-x') || '50',
+                    panY: el.getAttribute('data-pan-y') || '50'
+                });
+            });
+            return outputArray;
+        }
+
+        function showFeedbackNotice(msg) {
+            const noticeBox = document.createElement('div');
+            noticeBox.innerText = msg;
+            noticeBox.style.position = 'fixed';
+            noticeBox.style.bottom = '25px';
+            noticeBox.style.left = '50%';
+            noticeBox.style.transform = 'translateX(-50%)';
+            noticeBox.style.background = '#0f172a';
+            noticeBox.style.color = '#ffffff';
+            noticeBox.style.padding = '14px 28px';
+            noticeBox.style.borderRadius = '8px';
+            noticeBox.style.fontSize = '13px';
+            noticeBox.style.fontWeight = '600';
+            noticeBox.style.zIndex = '999999';
+            noticeBox.style.boxShadow = '0 20px 25px -5px rgba(0,0,0,0.3)';
+            document.body.appendChild(noticeBox);
+            setTimeout(() => noticeBox.remove(), 2500);
+        }
+
+        // --- History Serialization Storage Pipelines ---
+        function compileCurrentStateBlueprint() {
+            return JSON.stringify({
+                dimensions: {
+                    w: document.getElementById('cardW').value,
+                    h: document.getElementById('cardH').value
+                },
+                backgroundStyles: {
+                    color: cardBg.style.backgroundColor || 'white',
+                    imageSource: cardBgImageData || 'none',
+                    opacity: cardBg.style.opacity || '1'
+                },
+                elementsDataset: parseCanvasElementsToArray()
+            });
+        }
+
+        function saveHistoryState(isInitRun = false) {
+            const snapshotStr = compileCurrentStateBlueprint();
+            if (undoStack.length > 0 && undoStack[undoStack.length - 1] === snapshotStr) return; 
+            undoStack.push(snapshotStr);
+            if (undoStack.length > 40) undoStack.shift(); 
+            if (!isInitRun) redoStack = []; 
+        }
+
+        function undoWorkspaceAction() {
+            if (undoStack.length <= 1) return; 
+            const activeState = undoStack.pop();
+            redoStack.push(activeState);
+            applyStateBlueprintStr(undoStack[undoStack.length - 1]);
+            pushRealTimePreviewSync();
+        }
+
+        function redoWorkspaceAction() {
+            if (redoStack.length === 0) return;
+            const targetStateStr = redoStack.pop();
+            undoStack.push(targetStateStr);
+            applyStateBlueprintStr(targetStateStr);
+            pushRealTimePreviewSync();
+        }
+
+        function applyStateBlueprintStr(jsonStr) {
+            if (!jsonStr) return;
+            const blueprint = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+
+            document.getElementById('cardW').value = blueprint.dimensions.w;
+            document.getElementById('cardH').value = blueprint.dimensions.h;
+            updateCardSize();
+
+            cardBg.style.backgroundColor = blueprint.backgroundStyles.color;
+            cardBgImageData = blueprint.backgroundStyles.imageSource !== 'none' ? blueprint.backgroundStyles.imageSource : null;
+            cardBg.style.backgroundImage = cardBgImageData ? `url('${cardBgImageData}')` : 'none';
+            cardBg.style.opacity = blueprint.backgroundStyles.opacity;
+            document.getElementById('bgOpacity').value = blueprint.backgroundStyles.opacity;
+            
+            if (blueprint.backgroundStyles.color.startsWith('#')) {
+                document.getElementById('bgColor').value = blueprint.backgroundStyles.color;
+            }
+
+            card.querySelectorAll('.element').forEach(node => node.remove());
+            selectedElement = null;
+
+            (blueprint.elementsDataset || []).forEach(compData => {
+                const reconstructedNode = document.createElement('div');
+                reconstructedNode.className = 'element';
+                reconstructedNode.style.left = compData.left;
+                reconstructedNode.style.top = compData.top;
+                if (compData.width) reconstructedNode.style.width = compData.width;
+                if (compData.height) reconstructedNode.style.height = compData.height;
+                reconstructedNode.style.opacity = compData.opacity;
+                reconstructedNode.style.borderRadius = compData.borderRadius || '0px';
+                reconstructedNode.style.textAlign = compData.textAlign || 'center';
+                reconstructedNode.setAttribute('data-shape', compData.shape || 'square');
+                reconstructedNode.setAttribute('data-pan-x', compData.panX || '50');
+                reconstructedNode.setAttribute('data-pan-y', compData.panY || '50');
+
+                if (compData.type === 'text') {
+                    reconstructedNode.style.fontFamily = compData.baseFontFamily;
+                    reconstructedNode.style.fontSize = compData.baseFontSize;
+                    reconstructedNode.style.color = compData.baseColor;
+                    reconstructedNode.innerHTML = `
+                        <div class="text-content" contenteditable="true" style="text-align: ${compData.textAlign || 'center'};">${compData.innerPayload}</div>
+                        <div class="resize-handle"></div>
+                    `;
+                } else {
+                    reconstructedNode.classList.add('image-element');
+                    reconstructedNode.innerHTML = `
+                        <img src="${compData.innerPayload}" style="border-radius:inherit; object-position: ${compData.panX || 50}% ${compData.panY || 50}%;" />
+                        <div class="resize-handle"></div>
+                    `;
+                }
+
+                initElement(reconstructedNode);
+                card.appendChild(reconstructedNode);
+            });
+            refreshLayersListPanel();
+        }
+
+        // --- Display Orientation Configurations Matrix ---
+        function setOrientation(type) {
+            if (type === 'landscape') {
+                document.getElementById('cardW').value = 450;
+                document.getElementById('cardH').value = 280;
+            } else {
+                document.getElementById('cardW').value = 280;
+                document.getElementById('cardH').value = 450;
+            }
+            updateCardSize();
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function updateCardSize() {
+            card.style.width = document.getElementById('cardW').value + 'px';
+            card.style.height = document.getElementById('cardH').value + 'px';
+        }
+
+        // --- Background Handling ---
+        function handleBgUpload(event) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                cardBgImageData = e.target.result;
+                cardBg.style.backgroundImage = `url('${cardBgImageData}')`;
+                cardBg.style.backgroundColor = 'transparent';
+                saveHistoryState();
+                pushRealTimePreviewSync();
+            };
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateBgColor(val) {
+            cardBgImageData = null;
+            cardBg.style.backgroundImage = 'none';
+            cardBg.style.backgroundColor = val;
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function removeBackground() {
+            cardBgImageData = null;
+            cardBg.style.backgroundImage = 'none';
+            cardBg.style.backgroundColor = '#ffffff';
+            document.getElementById('bgOpacity').value = 1;
+            cardBg.style.opacity = 1;
+            document.getElementById('bgColor').value = '#ffffff';
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function updateBgOpacity(val) { 
+            cardBg.style.opacity = val; 
+        }
+
+        // --- Canvas Element Population ---
+        function addText() {
+            const el = document.createElement('div');
+            el.className = 'element';
+            el.style.left = '30px';
+            el.style.top = '40px';
+            el.style.fontSize = '18px';
+            el.style.fontFamily = 'Arial';
+            el.style.color = '#000000';
+            el.style.opacity = '1';
+            el.style.textAlign = 'center';
+            el.setAttribute('data-shape', 'square');
+            el.innerHTML = `
+                <div class="text-content" contenteditable="true" style="text-align: center;">Click to Edit Text</div>
+                <div class="resize-handle"></div>
+            `;
+            initElement(el);
+            card.appendChild(el);
+            selectElement(el);
+            refreshLayersListPanel();
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function handleImageUpload(event) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const el = document.createElement('div');
+                el.className = 'element image-element';
+                el.style.width = '110px';
+                el.style.height = '110px';
+                el.style.left = '40px';
+                el.style.top = '40px';
+                el.style.opacity = '1';
+                el.setAttribute('data-shape', 'square');
+                el.setAttribute('data-pan-x', '50');
+                el.setAttribute('data-pan-y', '50');
+                el.innerHTML = `
+                    <img src="${e.target.result}" style="border-radius:inherit; object-position: 50% 50%;" />
+                    <div class="resize-handle"></div>
+                `;
+                initElement(el);
+                card.appendChild(el);
+                selectElement(el);
+                refreshLayersListPanel();
+                saveHistoryState();
+                pushRealTimePreviewSync();
+            };
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // --- Interaction Drag/Drop & Real-Time Snapping ---
+        function initElement(el) {
+            let isDragging = false;
+            let isResizing = false;
+            let startX, startY, startW, startH, startLeft, startTop;
+
+            const textContentNode = el.querySelector('.text-content');
+            if (textContentNode) {
+                textContentNode.addEventListener('input', () => {
+                    pushRealTimePreviewSync();
+                });
+                textContentNode.addEventListener('blur', () => { saveHistoryState(); });
+            }
+
+            el.addEventListener('pointerdown', (e) => {
+                if (e.target.classList.contains('resize-handle')) {
+                    isResizing = true;
+                } else {
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+                    isDragging = true;
+                }
+                
+                selectElement(el);
+                startX = e.clientX;
+                startY = e.clientY;
+                startW = el.offsetWidth;
+                startH = el.offsetHeight;
+                startLeft = el.offsetLeft;
+                startTop = el.offsetTop;
+                
+                el.setPointerCapture(e.pointerId);
+                e.stopPropagation();
+            });
+
+            el.addEventListener('pointermove', (e) => {
+                if (!isDragging && !isResizing) return;
+
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                if (isResizing) {
+                    el.style.width = Math.max(1, startW + dx) + 'px';
+                    el.style.height = Math.max(1, startH + dy) + 'px';
+                } else if (isDragging) {
+                    el.style.left = (startLeft + dx) + 'px';
+                    el.style.top = (startTop + dy) + 'px';
+                    checkAlignmentGuides(el);
+                }
+                
+                pushRealTimePreviewSync();
+            });
+
+            el.addEventListener('pointerup', (e) => {
+                if (isDragging || isResizing) {
+                    isDragging = false;
+                    isResizing = false;
+                    el.releasePointerCapture(e.pointerId);
+                    
+                    hideAllAlignmentGuides();
+                    refreshLayersListPanel();
+                    saveHistoryState();
+                    pushRealTimePreviewSync();
+                }
+            });
+        }
+
+        // --- Core Attributes Transformation Vectors ---
+        function selectElement(el) {
+            if (selectedElement) selectedElement.classList.remove('active');
+            selectedElement = el;
+            if(selectedElement) {
+                selectedElement.classList.add('active');
+
+                document.getElementById('elOpacity').value = selectedElement.style.opacity || 1;
+                
+                const imgNode = selectedElement.querySelector('img');
+                if (imgNode) {
+                    document.getElementById('imgPanX').value = selectedElement.getAttribute('data-pan-x') || 50;
+                    document.getElementById('imgPanY').value = selectedElement.getAttribute('data-pan-y') || 50;
+                } else {
+                    const style = window.getComputedStyle(selectedElement);
+                    document.getElementById('fontSize').value = parseInt(style.fontSize);
+                    document.getElementById('fontFamily').value = style.fontFamily.replace(/['"]/g, '').split(',')[0];
+                    
+                    let rgb = style.color;
+                    if(rgb.includes('rgb')) {
+                        let values = rgb.match(/\d+/g);
+                        let hex = "#" + ((1 << 24) + (parseInt(values[0]) << 16) + (parseInt(values[1]) << 8) + parseInt(values[2])).toString(16).slice(1);
+                        document.getElementById('fontColor').value = hex;
+                    }
+                }
+            }
+            highlightActiveLayerRow();
+        }
+
+        function applySpanStyle(styleProperty, styleValue) {
+            if (!selectedElement || selectedElement.querySelector('img')) return;
+
+            const editableNode = selectedElement.querySelector('.text-content');
+            if (editableNode) editableNode.focus();
+
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) {
+                selectedElement.style[styleProperty] = styleValue;
+                setTimeout(() => { saveHistoryState(); pushRealTimePreviewSync(); }, 100);
+                return;
+            }
+
+            const range = selection.getRangeAt(0);
+            const span = document.createElement('span');
+            span.style[styleProperty] = styleValue;
+
+            try {
+                range.surroundContents(span);
+            } catch (e) {
+                document.execCommand('styleWithCSS', false, true);
+                if (styleProperty === 'fontFamily') document.execCommand('fontName', false, styleValue);
+                if (styleProperty === 'fontSize') document.execCommand('fontSize', false, 7);
+                if (styleProperty === 'color') document.execCommand('foreColor', false, styleValue);
+                if (styleProperty === 'fontSize') {
+                    const fontElements = editableNode.getElementsByTagName('font');
+                    for (let fontEl of fontElements) {
+                        if (fontEl.size === "7") {
+                            fontEl.removeAttribute("size");
+                            fontEl.style.fontSize = styleValue;
+                        }
+                    }
+                }
+            }
+            
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            setTimeout(() => { saveHistoryState(); pushRealTimePreviewSync(); }, 100);
+        }
+
+        function updateTextAlignment(alignValue) {
+            if (!selectedElement || selectedElement.querySelector('img')) return;
+            selectedElement.style.textAlign = alignValue;
+            const textContentNode = selectedElement.querySelector('.text-content');
+            if (textContentNode) textContentNode.style.textAlign = alignValue;
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function updateElementOpacity(val) {
+            if (!selectedElement) return;
+            selectedElement.style.opacity = val;
+        }
+
+        function applyImageFrameShape(shapeType) {
+            if (!selectedElement || !selectedElement.querySelector('img')) return;
+            selectedElement.setAttribute('data-shape', shapeType);
+
+            if (shapeType === 'circle') { selectedElement.style.borderRadius = '50%'; } 
+            else if (shapeType === 'rounded') { selectedElement.style.borderRadius = '12px'; } 
+            else { selectedElement.style.borderRadius = '0px'; }
+            saveHistoryState();
+            pushRealTimePreviewSync();
+        }
+
+        function updateImagePanningCoords() {
+            if (!selectedElement) return;
+            const imgNode = selectedElement.querySelector('img');
+            if (!imgNode) return;
+
+            const pxVal = document.getElementById('imgPanX').value;
+            const pyVal = document.getElementById('imgPanY').value;
+
+            selectedElement.setAttribute('data-pan-x', pxVal);
+            selectedElement.setAttribute('data-pan-y', pyVal);
+            imgNode.style.objectPosition = `${pxVal}% ${pyVal}%`;
+        }
+
+        function execTextCmd(cmdName, argumentVal = null) {
+            if (!selectedElement || selectedElement.querySelector('img')) return;
+            const editableNode = selectedElement.querySelector('.text-content');
+            if (editableNode) {
+                editableNode.focus();
+                document.execCommand(cmdName, false, argumentVal);
+                
+                setTimeout(() => {
+                    saveHistoryState();
+                    pushRealTimePreviewSync();
+                }, 100);
+            }
+        }
+
+        function deleteElement() {
+            if (selectedElement) {
+                selectedElement.remove();
+                selectElement(null);
+                refreshLayersListPanel();
+                saveHistoryState();
+                pushRealTimePreviewSync();
+            }
+        }
+
+        card.addEventListener('pointerdown', (e) => {
+            if (e.target === card || e.target === cardBg) {
+                if (selectedElement) selectedElement.classList.remove('active');
+                selectElement(null);
+            }
+        });
+
+        // --- Layers Panel Drawer Controllers ---
+        function toggleLayersDrawer() {
+            const drawerNode = document.getElementById('layers-drawer');
+            drawerNode.classList.toggle('open');
+            if(drawerNode.classList.contains('open')) refreshLayersListPanel();
+        }
+
+        function refreshLayersListPanel() {
+            const listWrapper = document.getElementById('layers-list-items');
+            listWrapper.innerHTML = '';
+            
+            const operationalElements = Array.from(card.querySelectorAll('.element'));
+            if(operationalElements.length === 0) {
+                listWrapper.innerHTML = `<p style="color:#64748b; font-style:italic; font-size:11px; text-align:center; margin-top:20px;">No custom layers rendered.</p>`;
+                return;
+            }
+
+            operationalElements.slice().reverse().forEach((nodeInstance, reverseIndex) => {
+                const originalIndex = operationalElements.length - 1 - reverseIndex;
+                const imageLayerChecker = nodeInstance.querySelector('img');
+                
+                const rowItemNode = document.createElement('div');
+                rowItemNode.className = 'layer-item';
+                if(nodeInstance === selectedElement) rowItemNode.classList.add('active-layer');
+
+                let content = '';
+                if (imageLayerChecker) {
+                    content = `
+                        <div class="layer-item-meta"><span style="font-weight:600; color:#334155;">[Image Layer]</span></div>
+                        <div class="layer-item-actions" style="margin-top: 4px;">
+                            <button class="purple" style="padding:4px 8px; font-size:11px; border-radius:4px; flex:1;" onclick="event.stopPropagation(); triggerLayerImageReplace(${originalIndex})">Replace Image</button>
+                            <button class="danger" style="padding:4px 8px; font-size:11px; border-radius:4px;" onclick="event.stopPropagation(); deleteTargetedLayer(${originalIndex})">Delete</button>
+                        </div>
+                    `;
+                } else {
+                    const txtContentNode = nodeInstance.querySelector('.text-content');
+                    const currentTextString = txtContentNode ? txtContentNode.innerText : '';
+                    content = `
+                        <div class="layer-item-meta"><span style="font-weight:600; color:#334155;">[Text Layer]</span></div>
+                        <div style="margin-top:4px; width:100%;" onclick="event.stopPropagation();">
+                            <input type="text" class="layer-edit-input" value="${currentTextString.replace(/"/g, '&quot;')}" oninput="updateTextFromLayerPanel(this, ${originalIndex})" onchange="saveHistoryState()" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()" style="width:100%; font-size:12px; padding:5px; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px;" placeholder="Modify text content...">
+                        </div>
+                        <div class="layer-item-actions" style="margin-top: 2px;">
+                            <button class="danger" style="padding:3px 8px; font-size:11px; border-radius:4px;" onclick="event.stopPropagation(); deleteTargetedLayer(${originalIndex})">Delete</button>
+                        </div>
+                    `;
+                }
+                rowItemNode.innerHTML = content;
+                rowItemNode.onclick = () => selectElement(operationalElements[originalIndex]);
+                listWrapper.appendChild(rowItemNode);
+            });
+        }
+        
+        function updateTextFromLayerPanel(inputElement, index) {
+            const operationalElements = card.querySelectorAll('.element');
+            const targetEl = operationalElements[index];
+            if(targetEl) {
+                const canvasTextNode = targetEl.querySelector('.text-content');
+                if(canvasTextNode) canvasTextNode.innerText = inputElement.value;
+                pushRealTimePreviewSync();
+            }
+        }
+
+        function highlightActiveLayerRow() {
+            const listWrapper = document.getElementById('layers-list-items');
+            const visualRowItems = listWrapper.querySelectorAll('.layer-item');
+            const operationalElements = Array.from(card.querySelectorAll('.element'));
+            
+            visualRowItems.forEach(row => row.classList.remove('active-layer'));
+            if(!selectedElement) return;
+
+            const trackingIndex = operationalElements.indexOf(selectedElement);
+            if(trackingIndex !== -1) {
+                const targetReverseRowOffset = operationalElements.length - 1 - trackingIndex;
+                if(visualRowItems[targetReverseRowOffset]) visualRowItems[targetReverseRowOffset].classList.add('active-layer');
+            }
+        }
+
+        function triggerLayerImageReplace(idx) {
+            imageReplacementIndexTarget = idx;
+            document.getElementById('replaceLayerImgInput').click();
+        }
+
+        function handleLayerImageReplacement(event) {
+            if (imageReplacementIndexTarget === null) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const operationalElements = card.querySelectorAll('.element');
+                const targetEl = operationalElements[imageReplacementIndexTarget];
+                if (targetEl) {
+                    const imgNode = targetEl.querySelector('img');
+                    if (imgNode) {
+                        imgNode.src = e.target.result;
+                        saveHistoryState();
+                        pushRealTimePreviewSync();
+                    }
+                }
+                imageReplacementIndexTarget = null;
+            };
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function deleteTargetedLayer(idx) {
+            const operationalElements = card.querySelectorAll('.element');
+            if(operationalElements[idx]) {
+                if(selectedElement === operationalElements[idx]) selectElement(null);
+                operationalElements[idx].remove();
+                refreshLayersListPanel();
+                saveHistoryState();
+                pushRealTimePreviewSync();
+            }
+        }
+
+        // --- Native Printing ---
+        function printCard() {
+            generateHDCanvas(2, (printCanvas) => {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html><head><title>Print ID Card</title><style>
+                        body { margin: 0; display: flex; justify-content: center; align-items: center; }
+                        img { max-width: 100%; max-height: 100vh; }
+                        @page { size: auto; margin: 20px; }
+                    </style></head><body>
+                        <img src="${printCanvas.toDataURL('image/png')}" />
+                        <script>
+                            window.onload = () => { window.print(); window.close(); };
+                        <\/script>
+                    </body></html>`);
+                printWindow.document.close();
+            });
+        }
+
+        // --- DASHBOARD RENDERER FOR APPROVED & USER TEMPLATES ---
+        function renderTemplatesList() {
+            const approvedGrid = document.getElementById('approved-templates-list');
+            const userGrid = document.getElementById('user-templates-list');
+            const paginationBox = document.getElementById('pagination-controls');
+
+            approvedGrid.innerHTML = '';
+            userGrid.innerHTML = '';
+
+            const approvedList = isBackendConnected ? loadedApprovedStore : [];
+            const userList = isBackendConnected ? loadedUserStore : JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+
+            // Render Approved Templates
+            if (approvedList.length === 0) {
+                approvedGrid.innerHTML = '<p style="color: #64748b; font-style: italic; font-size: 12px;">No approved public templates published yet.</p>';
+            } else {
+                approvedList.forEach(blueprint => renderTemplateCard(blueprint, approvedGrid, true));
+            }
+
+            // Render User Created Templates
+            if (userList.length === 0) {
+                userGrid.innerHTML = '<p style="color: #64748b; font-style: italic; font-size: 12px;">No personal templates saved yet. Create a design and click "Save As Template".</p>';
+            } else {
+                userList.forEach(blueprint => renderTemplateCard(blueprint, userGrid, false));
+            }
+
+            // Pagination Controls
+            paginationBox.style.display = (isBackendConnected && hasMoreBackendData) ? 'flex' : 'none';
+        }
+
+        function renderTemplateCard(blueprint, containerNode, isApprovedGroup) {
+            const itemContainer = document.createElement('div');
+            itemContainer.className = 'template-item';
+            if (String(blueprint.uid) === String(currentActiveTemplateUid)) {
+                itemContainer.style.borderColor = 'var(--primary)';
+                itemContainer.style.background = '#eff6ff';
+            }
+
+            const fixedBoundWidth = 180;
+            const scaleDownRatio = fixedBoundWidth / parseFloat(blueprint.dimensions.w);
+            const calculatedFrameHeight = parseFloat(blueprint.dimensions.h) * scaleDownRatio;
+
+            // Show discard/delete option based on ownership/admin status
+            const canDelete = isApprovedGroup ? (currentUserSession && currentUserSession.isAdmin) : true;
+
+            itemContainer.innerHTML = `
+                <div id="preview-box-container-${blueprint.uid}" class="preview-container-box" style="width:${fixedBoundWidth}px; height:${calculatedFrameHeight}px;" onclick="loadTemplateBlueprint('${blueprint.uid}')"></div>
+                <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px; width:${fixedBoundWidth}px;">
+                    <span style="font-size:12px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${blueprint.label}">${blueprint.label}</span>
+                    <div style="display:flex; gap:6px;">
+                        <button onclick="loadTemplateBlueprint('${blueprint.uid}')" style="padding:4px 8px; font-size:11px; flex:1;">Load Design</button>
+                        ${canDelete ? `<button class="danger" onclick="deleteTemplateBlueprint(event, '${blueprint.uid}')" style="padding:4px 8px; font-size:11px;">Discard</button>` : ''}
+                    </div>
+                </div>
+            `;
+
+            containerNode.appendChild(itemContainer);
+            const box = document.getElementById(`preview-box-container-${blueprint.uid}`);
+            if (box) injectLiveMirrorCloneToBox(box, blueprint);
+        }
+
+        function loadTemplateBlueprint(uid) {
+            const store = isBackendConnected ? loadedApprovedStore.concat(loadedUserStore) : JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+            const targetingBlueprint = store.find(b => String(b.uid) === String(uid));
+            if (!targetingBlueprint) return;
+
+            currentActiveTemplateUid = targetingBlueprint.uid;
+            applyStateBlueprintStr(targetingBlueprint);
+            saveHistoryState(true);
+            renderTemplatesList();
+            showFeedbackNotice(`Loaded design: "${targetingBlueprint.label}"`);
+        }
+
+        async function deleteTemplateBlueprint(event, uid) {
+            event.stopPropagation();
+            if (!confirm("Are you sure you want to permanently discard this template blueprint?")) return;
+
+            if (isBackendConnected) {
+                showFeedbackNotice("Deleting template from backend...");
+                const res = await callBackendApi({
+                    action: 'delete',
+                    uid: uid,
+                    username: currentUserSession ? currentUserSession.username : null,
+                    isAdmin: currentUserSession ? currentUserSession.isAdmin : false
+                });
+
+                if (res && res.success) {
+                    loadedUserStore = loadedUserStore.filter(b => String(b.uid) !== String(uid));
+                    loadedApprovedStore = loadedApprovedStore.filter(b => String(b.uid) !== String(uid));
+                    if (String(currentActiveTemplateUid) === String(uid)) currentActiveTemplateUid = null;
+                    renderTemplatesList();
+                    showFeedbackNotice(res.message);
+                } else {
+                    alert(res ? res.message : "Deletion failed.");
+                }
+            } else {
+                let localList = JSON.parse(localStorage.getItem('app_id_card_blueprints_v2') || '[]');
+                localList = localList.filter(b => String(b.uid) !== String(uid));
+                localStorage.setItem('app_id_card_blueprints_v2', JSON.stringify(localList));
+                if (String(currentActiveTemplateUid) === String(uid)) currentActiveTemplateUid = null;
+                renderTemplatesList();
+                showFeedbackNotice("Blueprint discarded.");
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+BACKEND V2
+
+
+/**
+ * Enterprise ID Card Designer - Google Apps Script Backend Engine
+ * Supports automated sheet initialization, chunked storage (bypasses Google Sheets 50k character cell limit),
+ * User Authentication, OTP Password Reset, Admin System, and Approved Public Templates.
+ */
+
+// HARDCODED ADMIN CREDENTIALS (Stored directly in script backend)
+const ADMIN_CREDENTIALS = {
+  username: "admin",
+  password: "AdminPassword123!", // Change to your preferred admin password
+  email: "admin@example.com"
+};
+
+function doGet(e) {
+  return handleRequest(e);
+}
+
+function doPost(e) {
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var data = {};
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err) {
+        data = e.parameter;
+      }
+    } else if (e.parameter) {
+      data = e.parameter;
+    }
+
+    var action = data.action;
+    var result = { success: false };
+
+    // Setup required Google Sheet tabs automatically
+    var sheets = initializeDatabaseSheets();
+
+    if (action === 'init') {
+      result = { success: true, message: 'Database initialized successfully.' };
+    } 
+    else if (action === 'register') {
+      result = registerUser(sheets.users, data.user);
+    } 
+    else if (action === 'login') {
+      result = loginUser(sheets.users, data.credentials);
+    } 
+    else if (action === 'admin_login') {
+      result = verifyAdminLogin(data.credentials);
+    }
+    else if (action === 'request_otp') {
+      result = sendPasswordResetOTP(sheets.users, sheets.otp, data.identifier);
+    } 
+    else if (action === 'reset_password_otp') {
+      result = resetPasswordWithOTP(sheets.users, sheets.otp, data.resetData);
+    } 
+    else if (action === 'save') {
+      result = saveTemplateRecord(sheets.blueprints, data.template, data.userToken);
+    } 
+    else if (action === 'load') {
+      var offset = parseInt(data.offset || 0, 10);
+      var limit = parseInt(data.limit || 6, 10);
+      result = loadTemplateRecords(sheets.blueprints, data.username, data.isAdmin, offset, limit);
+    } 
+    else if (action === 'delete') {
+      result = deleteTemplateRecord(sheets.blueprints, data.uid, data.username, data.isAdmin);
+    } 
+    else {
+      result = { success: false, message: 'Invalid API action request.' };
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Automatically sets up database tabs and styled headers.
+ */
+function initializeDatabaseSheets() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Blueprints Tab
+  var blueprintsSheet = ss.getSheetByName("ID_Card_Blueprints") || ss.insertSheet("ID_Card_Blueprints");
+  if (blueprintsSheet.getLastRow() === 0) {
+    blueprintsSheet.getRange(1, 1, 1, 7).setValues([["uid", "label", "dimensions", "owner", "isApproved", "updatedAt", "payload_chunks"]]);
+    blueprintsSheet.getRange(1, 1, 1, 7).setFontWeight("bold").setBackground("#2563eb").setFontColor("#ffffff");
+    blueprintsSheet.setFrozenRows(1);
+  }
+
+  // Users Tab
+  var usersSheet = ss.getSheetByName("Users") || ss.insertSheet("Users");
+  if (usersSheet.getLastRow() === 0) {
+    usersSheet.getRange(1, 1, 1, 4).setValues([["username", "email", "password", "createdAt"]]);
+    usersSheet.getRange(1, 1, 1, 4).setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+    usersSheet.setFrozenRows(1);
+  }
+
+  // OTP Tab
+  var otpSheet = ss.getSheetByName("OTP_Store") || ss.insertSheet("OTP_Store");
+  if (otpSheet.getLastRow() === 0) {
+    otpSheet.getRange(1, 1, 1, 4).setValues([["email", "otp", "expiresAt", "used"]]);
+    otpSheet.getRange(1, 1, 1, 4).setFontWeight("bold").setBackground("#8b5cf6").setFontColor("#ffffff");
+    otpSheet.setFrozenRows(1);
+  }
+
+  return { blueprints: blueprintsSheet, users: usersSheet, otp: otpSheet };
+}
+
+/**
+ * Registers a new user account in Google Sheets.
+ */
+function registerUser(sheet, user) {
+  if (!user || !user.username || !user.email || !user.password) {
+    return { success: false, message: "Missing required registration details." };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var usernameLower = String(user.username).trim().toLowerCase();
+  var emailLower = String(user.email).trim().toLowerCase();
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).toLowerCase() === usernameLower) {
+      return { success: false, message: "Username already exists. Choose another." };
+    }
+    if (String(data[i][1]).toLowerCase() === emailLower) {
+      return { success: false, message: "Email is already registered. Please login." };
+    }
+  }
+
+  sheet.appendRow([user.username.trim(), emailLower, user.password, new Date().toISOString()]);
+  return { success: true, message: "Account registered successfully!", username: user.username.trim(), email: emailLower };
+}
+
+/**
+ * Authenticates user login credentials.
+ */
+function loginUser(sheet, creds) {
+  if (!creds || !creds.identifier || !creds.password) {
+    return { success: false, message: "Please provide both username/email and password." };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var idLower = String(creds.identifier).trim().toLowerCase();
+
+  for (var i = 1; i < data.length; i++) {
+    var uName = String(data[i][0]).trim();
+    var uEmail = String(data[i][1]).trim();
+    var uPass = String(data[i][2]);
+
+    if ((uName.toLowerCase() === idLower || uEmail.toLowerCase() === idLower) && uPass === creds.password) {
+      return { success: true, message: "Login successful!", username: uName, email: uEmail };
+    }
+  }
+  return { success: false, message: "Invalid username/email or password." };
+}
+
+/**
+ * Verifies Admin Credentials directly from backend code constants.
+ */
+function verifyAdminLogin(creds) {
+  if (!creds || !creds.username || !creds.password || !creds.email) {
+    return { success: false, message: "All admin login fields are required." };
+  }
+
+  if (creds.username.trim() === ADMIN_CREDENTIALS.username &&
+      creds.password === ADMIN_CREDENTIALS.password &&
+      creds.email.trim().toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase()) {
+    return { success: true, message: "Admin authenticated successfully!", isAdmin: true, username: "ADMIN" };
+  }
+  return { success: false, message: "Invalid admin authentication details." };
+}
+
+/**
+ * Sends a 6-digit OTP code to the registered email for password recovery.
+ */
+function sendPasswordResetOTP(usersSheet, otpSheet, identifier) {
+  if (!identifier) return { success: false, message: "Please enter your username or email." };
+
+  var userData = usersSheet.getDataRange().getValues();
+  var idLower = String(identifier).trim().toLowerCase();
+  var targetEmail = "";
+
+  for (var i = 1; i < userData.length; i++) {
+    if (String(userData[i][0]).toLowerCase() === idLower || String(userData[i][1]).toLowerCase() === idLower) {
+      targetEmail = String(userData[i][1]).trim();
+      break;
+    }
+  }
+
+  if (!targetEmail) {
+    return { success: false, message: "Registered account not found." };
+  }
+
+  var otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  var expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+  otpSheet.appendRow([targetEmail, otpCode, expiresAt, false]);
+
+  try {
+    MailApp.sendEmail(targetEmail, "ID Card Maker - Password Reset OTP", "Your OTP for resetting your password is: " + otpCode + "\n\nThis OTP will expire in 10 minutes.");
+    return { success: true, message: "OTP sent to registered email: " + targetEmail, email: targetEmail };
+  } catch (err) {
+    return { success: false, message: "Failed to send email OTP: " + err.toString() };
+  }
+}
+
+/**
+ * Resets user password after verifying OTP.
+ */
+function resetPasswordWithOTP(usersSheet, otpSheet, resetData) {
+  if (!resetData || !resetData.email || !resetData.otp || !resetData.newPassword) {
+    return { success: false, message: "All fields are required." };
+  }
+
+  var otpData = otpSheet.getDataRange().getValues();
+  var emailLower = String(resetData.email).trim().toLowerCase();
+  var isValidOtp = false;
+  var otpRowIndex = -1;
+
+  for (var i = otpData.length - 1; i >= 1; i--) {
+    if (String(otpData[i][0]).toLowerCase() === emailLower &&
+        String(otpData[i][1]) === String(resetData.otp) &&
+        !otpData[i][3]) {
+      
+      var expires = new Date(otpData[i][2]);
+      if (expires.getTime() > Date.now()) {
+        isValidOtp = true;
+        otpRowIndex = i + 1;
+        break;
+      }
+    }
+  }
+
+  if (!isValidOtp) {
+    return { success: false, message: "Invalid or expired OTP code." };
+  }
+
+  var userData = usersSheet.getDataRange().getValues();
+  var userRowIndex = -1;
+  for (var j = 1; j < userData.length; j++) {
+    if (String(userData[j][1]).toLowerCase() === emailLower) {
+      userRowIndex = j + 1;
+      break;
+    }
+  }
+
+  if (userRowIndex > 0) {
+    usersSheet.getRange(userRowIndex, 3).setValue(resetData.newPassword);
+    otpSheet.getRange(otpRowIndex, 4).setValue(true);
+    return { success: true, message: "Password reset successfully! You can now log in." };
+  }
+
+  return { success: false, message: "User account not found." };
+}
+
+/**
+ * Writes text into adjacent cells in chunks to bypass Google Sheets' 50,000 character cell limit.
+ */
+function writeChunkedPayload(sheet, rowIndex, startCol, text) {
+  var CHUNK_SIZE = 40000;
+  var chunks = [];
+  for (var i = 0; i < text.length; i += CHUNK_SIZE) {
+    chunks.push(text.substring(i, i + CHUNK_SIZE));
+  }
+  if (chunks.length === 0) chunks.push("");
+
+  var maxCols = Math.max(sheet.getLastColumn(), startCol + chunks.length + 5);
+  sheet.getRange(rowIndex, startCol, 1, maxCols - startCol + 1).clearContent();
+  sheet.getRange(rowIndex, startCol, 1, chunks.length).setValues([chunks]);
+}
+
+/**
+ * Reads and concatenates chunked text across cells starting at `startColIndex`.
+ */
+function readChunkedPayload(rowValues, startColIndex) {
+  var chunks = [];
+  for (var i = startColIndex; i < rowValues.length; i++) {
+    if (rowValues[i] !== "" && rowValues[i] !== null && rowValues[i] !== undefined) {
+      chunks.push(String(rowValues[i]));
+    } else {
+      break;
+    }
+  }
+  return chunks.join("");
+}
+
+/**
+ * Saves or updates a template record using chunked storage for large image payloads.
+ */
+function saveTemplateRecord(sheet, template, userToken) {
+  if (!template || !template.uid) {
+    return { success: false, message: "Invalid template payload." };
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var uidStr = String(template.uid);
+  var rowIndex = -1;
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === uidStr) {
+      rowIndex = i + 1;
+      break;
+    }
+  }
+
+  var now = new Date().toISOString();
+  var dimensionsStr = JSON.stringify(template.dimensions || {});
+  var owner = (userToken && userToken.username) ? userToken.username : "ANONYMOUS";
+  var isApproved = (userToken && userToken.isAdmin) ? true : false;
+
+  var payloadObject = {
+    backgroundStyles: template.backgroundStyles || {},
+    elementsDataset: template.elementsDataset || []
+  };
+  var payloadStr = JSON.stringify(payloadObject);
+
+  if (rowIndex > 0) {
+    var existingOwner = data[rowIndex - 1][3];
+    var existingApproved = Boolean(data[rowIndex - 1][4]);
+
+    // Regular users updating an approved template will automatically branch off a personal copy
+    if (existingApproved && !isApproved) {
+      var newUid = Date.now();
+      var newRowIndex = sheet.getLastRow() + 1;
+      sheet.getRange(newRowIndex, 1, 1, 6).setValues([[
+        String(newUid),
+        template.label + " (My Copy)",
+        dimensionsStr,
+        owner,
+        false,
+        now
+      ]]);
+      writeChunkedPayload(sheet, newRowIndex, 7, payloadStr);
+      return { success: true, message: "Branch copy saved under your account.", uid: newUid };
+    }
+
+    // Direct update
+    sheet.getRange(rowIndex, 1, 1, 6).setValues([[
+      uidStr,
+      template.label || "Untitled Template",
+      dimensionsStr,
+      existingOwner || owner,
+      existingApproved || isApproved,
+      now
+    ]]);
+    writeChunkedPayload(sheet, rowIndex, 7, payloadStr);
+    return { success: true, message: "Template changes updated successfully.", uid: template.uid };
+  } else {
+    // Append new template
+    var appendRowIndex = sheet.getLastRow() + 1;
+    sheet.getRange(appendRowIndex, 1, 1, 6).setValues([[
+      uidStr,
+      template.label || "Untitled Template",
+      dimensionsStr,
+      owner,
+      isApproved,
+      now
+    ]]);
+    writeChunkedPayload(sheet, appendRowIndex, 7, payloadStr);
+    return { success: true, message: isApproved ? "Approved Public Template published!" : "Template saved successfully.", uid: template.uid };
+  }
+}
+
+/**
+ * Loads template records with re-assembled payload chunks and pagination support.
+ */
+function loadTemplateRecords(sheet, username, isAdmin, offset, limit) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return { success: true, approvedTemplates: [], userTemplates: [], totalUserTemplates: 0, hasMore: false };
+  }
+
+  var maxCols = Math.max(7, sheet.getLastColumn());
+  var data = sheet.getRange(2, 1, lastRow - 1, maxCols).getValues();
+
+  var approvedTemplates = [];
+  var userTemplates = [];
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    var row = data[i];
+    var rawPayload = readChunkedPayload(row, 6);
+    
+    var backgroundStyles = { color: "#ffffff", imageSource: "none", opacity: "1" };
+    var elementsDataset = [];
+
+    if (rawPayload) {
+      try {
+        var parsedPayload = JSON.parse(rawPayload);
+        backgroundStyles = parsedPayload.backgroundStyles || backgroundStyles;
+        elementsDataset = parsedPayload.elementsDataset || elementsDataset;
+      } catch (e) {}
+    }
+
+    var item = {
+      uid: row[0],
+      label: row[1],
+      dimensions: typeof row[2] === 'string' ? JSON.parse(row[2]) : row[2],
+      backgroundStyles: backgroundStyles,
+      elementsDataset: elementsDataset,
+      owner: row[3],
+      isApproved: Boolean(row[4]),
+      updatedAt: row[5]
+    };
+
+    if (item.isApproved) {
+      approvedTemplates.push(item);
+    } else if (username && String(item.owner).toLowerCase() === String(username).toLowerCase()) {
+      userTemplates.push(item);
+    }
+  }
+
+  var pagedUserTemplates = userTemplates.slice(offset, offset + limit);
+  var hasMore = (offset + limit) < userTemplates.length;
+
+  return {
+    success: true,
+    approvedTemplates: approvedTemplates,
+    userTemplates: pagedUserTemplates,
+    totalUserTemplates: userTemplates.length,
+    hasMore: hasMore
+  };
+}
+
+/**
+ * Deletes a template record by UID.
+ */
+function deleteTemplateRecord(sheet, uid, username, isAdmin) {
+  if (!uid) return { success: false, message: "Missing template identifier." };
+  var data = sheet.getDataRange().getValues();
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(uid)) {
+      var isApproved = Boolean(data[i][4]);
+      var owner = String(data[i][3]);
+
+      if (isApproved && !isAdmin) {
+        return { success: false, message: "Regular users cannot delete Approved Public Templates." };
+      }
+
+      if (!isAdmin && String(owner).toLowerCase() !== String(username).toLowerCase()) {
+        return { success: false, message: "You can only delete your own created templates." };
+      }
+
+      sheet.deleteRow(i + 1);
+      return { success: true, message: "Template deleted successfully from backend." };
+    }
+  }
+  return { success: false, message: "Target template record not found." };
+}
